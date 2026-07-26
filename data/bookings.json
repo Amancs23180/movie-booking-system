@@ -1,0 +1,28 @@
+[
+  {
+    "movie": "Oppenheimer",
+    "name": "aman pandey",
+    "seats": "10"
+  },
+  {
+    "movie": "Avatar: The Way of Water",
+    "name": "Aman Pandey",
+    "seats": "2"
+  },
+  {
+    "movie": "Oppenheimer",
+    "date": "Tuesday, 28 July",
+    "time": "12:30 PM",
+    "ticketClass": "VIP Recliner (₹400)",
+    "name": "Aman Pandey",
+    "seats": "2"
+  },
+  {
+    "movie": "Dhurandhar",
+    "date": "Today, 26 July",
+    "time": "12:30 PM",
+    "ticketClass": "Normal (₹180)",
+    "name": "aman",
+    "seats": "2"
+  }
+]

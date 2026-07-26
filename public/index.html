@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineVerse | Premium Ticket Booking</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-container">
+        <header>
+            <h1>🎬 CINE<span>VERSE</span></h1>
+            <p class="subtitle">Experience Cinema in Luxury</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Left Side: Interactive Booking Form -->
+            <section class="form-section">
+                <h3>Select Your Experience</h3>
+                <form id="bookForm">
+                    <div class="input-group">
+                        <label for="movie">Now Showing</label>
+                        <select id="movie" required>
+                            <option value="Dhurandhar">Dhurandhar (Action/Drama)</option>
+                            <option value="Chhava">Chhava (Historical Epic)</option>
+                            <option value="Singham Again">Singham Again (Masala/Action)</option>
+                            <option value="Oppenheimer">Oppenheimer (70mm IMAX)</option>
+                        </select>
+                    </div>
+
+                    <div class="row-inputs">
+                        <div class="input-group">
+                            <label for="date">Select Date</label>
+                            <select id="date" required>
+                                <option value="Today, 26 July">Today, 26 July</option>
+                                <option value="Tomorrow, 27 July">Tomorrow, 27 July</option>
+                                <option value="Tuesday, 28 July">Tuesday, 28 July</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="time">Showtime</label>
+                            <select id="time" required>
+                                <option value="12:30 PM">12:30 PM (👇 20% Off)</option>
+                                <option value="04:15 PM">04:15 PM</option>
+                                <option value="07:45 PM">07:45 PM (Prime Time)</option>
+                                <option value="10:30 PM">10:30 PM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row-inputs">
+                        <div class="input-group">
+                            <label for="ticketClass">Seat Class</label>
+                            <select id="ticketClass" required>
+                                <option value="Normal (₹180)">Normal (₹180)</option>
+                                <option value="Premium (₹250)">Premium (₹250)</option>
+                                <option value="VIP Recliner (₹400)">VIP Recliner (₹400)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="seats">Seats</label>
+                            <input type="number" id="seats" placeholder="Qty" min="1" max="10" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="name">Viewer Name</label>
+                        <input type="text" id="name" placeholder="e.g. Aman Pandey" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Confirm Reservation</button>
+                </form>
+            </section>
+
+            <!-- Right Side: Live Premium Ticket Feed -->
+            <section class="feed-section">
+                <h3>Live Reservations</h3>
+                <div class="list-wrapper">
+                    <ul id="list"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const form = document.getElementById('bookForm');
+        
+        async function load() {
+            const res = await fetch('/api/bookings');
+            const data = await res.json();
+            document.getElementById('list').innerHTML = data.map(b => `
+                <li class="ticket-card">
+                    <div class="ticket-info">
+                        <h4>${b.movie}</h4>
+                        <p class="ticket-meta">📅 ${b.date} | ⏰ ${b.time}</p>
+                        <p class="ticket-user">Class: <strong>${b.ticketClass.split(' ')[0]}</strong> | By: ${b.name}</p>
+                    </div>
+                    <div class="ticket-count">${b.seats} Pass</div>
+                </li>
+            `).join('');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await fetch('/api/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    movie: document.getElementById('movie').value,
+                    date: document.getElementById('date').value,
+                    time: document.getElementById('time').value,
+                    ticketClass: document.getElementById('ticketClass').value,
+                    name: document.getElementById('name').value,
+                    seats: document.getElementById('seats').value
+                })
+            });
+            form.reset();
+            load();
+        });
+        load();
+    </script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #0b0914 0%, #030206 100%);
+    --glass-bg: rgba(255, 255, 255, 0.02);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --primary-color: #ff2a5f;
+    --accent-color: #00e5ff;
+    --text-main: #ffffff;
+    --text-muted: #79788a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.glass-container {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 950px;
+    padding: 35px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.3rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+header h1 span {
+    color: var(--primary-color);
+    text-shadow: 0 0 15px rgba(255, 42, 95, 0.4);
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 35px;
+}
+
+@media (max-width: 768px) {
+    .main-content { grid-template-columns: 1fr; }
+}
+
+h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+    letter-spacing: 0.5px;
+}
+
+.input-group {
+    margin-bottom: 18px;
+    flex: 1;
+}
+
+.row-inputs {
+    display: flex;
+    gap: 15px;
+}
+
+label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.15);
+}
+
+select option {
+    background: #0b0914;
+    color: white;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, var(--primary-color), #ff527b);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 15px rgba(255, 42, 95, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 42, 95, 0.4);
+}
+
+/* Feed List Styling */
+.list-wrapper {
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.list-wrapper::-webkit-scrollbar { width: 4px; }
+.list-wrapper::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+.ticket-card {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.ticket-info h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.ticket-meta {
+    font-size: 0.75rem;
+    color: var(--accent-color);
+    margin: 3px 0;
+}
+
+.ticket-user {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.ticket-count {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    background: rgba(255, 42, 95, 0.08);
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 42, 95, 0.15);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
