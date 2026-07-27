@@ -40,21 +40,22 @@
         .time-btn { background: #fff; border: 1px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 10px; font-weight: 600; }
         .time-btn:hover { background: #10b981; color: white; }
 
-        /* THEATRE LAYOUT ENGINE */
-        .seating-area { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 40px 20px; max-width: 950px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .category-header { font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 1px; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin: 25px 0 15px 0; padding-left: 50px; }
+        /* PROFESSIONAL BMS LIGHT LAYOUT */
+        .seating-area { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 40px 20px; max-width: 950px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); overflow-x: auto; }
+        .category-header { font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 1px; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin: 25px 0 15px 0; padding-left: 50px; text-align: left; }
         
-        .seat-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .seat-row { display: flex; align-items: center; margin-bottom: 10px; min-width: 750px; }
         .row-label { width: 40px; font-weight: bold; color: #94a3b8; font-size: 14px; text-align: left; padding-left: 10px; }
-        .row-seats { display: flex; flex-grow: 1; justify-content: center; gap: 6px; }
+        .row-seats { display: flex; flex-grow: 1; justify-content: center; gap: 8px; }
         
-        .seat { width: 32px; height: 32px; border: 1px solid #10b981; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #10b981; cursor: pointer; transition: all 0.15s; background: #ffffff; }
+        .seat { width: 34px; height: 34px; border: 1px solid #10b981; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #10b981; cursor: pointer; transition: all 0.15s; background: #ffffff; user-select: none; }
+        .seat:hover:not(.occupied) { background: #10b981; color: white; }
         .seat.selected { background: #10b981 !important; color: white !important; }
-        .seat.occupied { background: #e2e8f0 !important; border-color: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed; }
-        .seat.gap { visibility: hidden; width: 24px; cursor: default; border: none; }
+        .seat.occupied { background: #e2e8f0 !important; border-color: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed; text-decoration: none; }
+        .seat.gap { visibility: hidden; width: 28px; cursor: default; border: none; }
 
         .screen-container { text-align: center; margin: 60px 0 20px 0; }
-        .cinema-screen { background: linear-gradient(to bottom, #e2e8f0, #f8fafc); height: 8px; width: 50%; margin: 0 auto; border-radius: 50% / 0 0 100% 100%; box-shadow: 0 6px 12px rgba(0,0,0,0.06); border: 1px solid #cbd5e1; }
+        .cinema-screen { background: linear-gradient(to bottom, #e2e8f0, #f8fafc); height: 8px; width: 60%; margin: 0 auto; border-radius: 50% / 0 0 100% 100%; box-shadow: 0 6px 12px rgba(0,0,0,0.06); border: 1px solid #cbd5e1; }
         .screen-text { font-size: 11px; color: #94a3b8; margin-top: 8px; text-transform: uppercase; letter-spacing: 1.5px; }
 
         .legend { display: flex; justify-content: center; gap: 30px; margin-top: 30px; font-size: 13px; font-weight: 500; color: #475569; }
@@ -81,13 +82,13 @@
     </div>
 
     <div class="container">
-        <!-- Dashboard -->
+        <!-- Dashboard View -->
         <div id="section-dashboard" class="view-section active-section">
             <h2 id="dashboard-heading">Recommended Movies</h2>
             <div class="movies-grid" id="movies-container"></div>
         </div>
 
-        <!-- Details & Showtimes -->
+        <!-- Details & Timings View -->
         <div id="section-details" class="view-section">
             <button class="city-btn" onclick="showDashboard()" style="margin-bottom:20px;">← Back to Movies</button>
             <div class="details-layout" id="details-root"></div>
@@ -97,7 +98,7 @@
             <div id="theatres-root"></div>
         </div>
 
-        <!-- Interactive Layout Grid -->
+        <!-- Corrected Matrix Layout View -->
         <div id="section-seats" class="view-section">
             <button class="city-btn" onclick="showDetails(currentMovie.id)" style="margin-bottom:20px;">← Back to Times</button>
             <h2 style="text-align:center; margin-bottom:5px;" id="seat-movie-title">Movie</h2>
@@ -121,7 +122,7 @@
             <button class="btn-prime" onclick="processBooking()">Book Tickets (<span id="total-price-display">₹0</span>)</button>
         </div>
 
-        <!-- Receipt -->
+        <!-- Receipt View -->
         <div id="section-receipt" class="view-section">
             <div class="receipt" id="receipt-root"></div>
             <button class="btn-prime" onclick="showDashboard()">Book More Movies</button>

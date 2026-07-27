@@ -6,7 +6,7 @@ let selectedTheatre = null;
 let selectedTime = "";
 let selectedSeats = [];
 
-// Matrix Configuration to replicate user layout
+// Clean layout matrix configurations
 const SEAT_LAYOUT = [
     { category: "₹1350 RECLINER", rows: [{ name: "K", count: 14, gaps: [2, 4, 6, 8, 10, 12], price: 1350 }] },
     { category: "₹540 PREMIUM", rows: [
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
             buildCityModal();
             selectCity(appData.cities[0]);
         })
-        .catch(err => console.error("Initialization failed:", err));
+        .catch(err => console.error("Initialization data file fetch error:", err));
 
     document.getElementById("nav-city-btn").addEventListener("click", () => {
         document.getElementById("city-modal").style.display = "flex";
@@ -156,73 +156,79 @@ function loadSeatGrid() {
     const gridContainer = document.getElementById("dynamic-seating-grid");
     gridContainer.innerHTML = "";
 
+    // Generate elements synchronously first so user can click regardless of networking state
+    const seatDOMRefs = {};
+
+    SEAT_LAYOUT.forEach(catBlock => {
+        const header = document.createElement("div");
+        header.className = "category-header";
+        header.innerText = catBlock.category;
+        gridContainer.appendChild(header);
+
+        catBlock.rows.forEach(rowData => {
+            const rowDiv = document.createElement("div");
+            rowDiv.className = "seat-row";
+
+            const label = document.createElement("div");
+            label.className = "row-label";
+            label.innerText = rowData.name;
+            rowDiv.appendChild(label);
+
+            const seatsWrapper = document.createElement("div");
+            seatsWrapper.className = "row-seats";
+
+            for (let sNum = rowData.count; sNum >= 1; sNum--) {
+                const seatId = `${rowData.name}-${sNum}`;
+
+                const seat = document.createElement("div");
+                seat.className = "seat";
+                seat.innerText = sNum;
+
+                seat.onclick = () => {
+                    if (seat.classList.contains("occupied")) return;
+
+                    if (seat.classList.contains("selected")) {
+                        seat.classList.remove("selected");
+                        selectedSeats = selectedSeats.filter(s => s.id !== seatId);
+                    } else {
+                        seat.classList.add("selected");
+                        selectedSeats.push({ id: seatId, price: rowData.price });
+                    }
+                    calculatePrice();
+                };
+
+                seatsWrapper.appendChild(seat);
+                seatDOMRefs[seatId] = seat;
+
+                if (rowData.gaps.includes(sNum)) {
+                    const gap = document.createElement("div");
+                    gap.className = "seat gap";
+                    seatsWrapper.appendChild(gap);
+                }
+            }
+            rowDiv.appendChild(seatsWrapper);
+            gridContainer.appendChild(rowDiv);
+        });
+    });
+
+    // Layer bookings asynchronously onto DOM elements safely
     fetch('/api/bookings')
         .then(res => res.json())
         .then(bookings => {
-            const occupiedMap = new Set();
-            if (Array.isArray(bookings)) {
-                bookings.forEach(b => {
-                    if (b.city === selectedCity && b.movieId === currentMovie.id && b.theatreId === selectedTheatre.id && b.date === selectedDate && b.time === selectedTime) {
-                        if (b.seats) b.seats.forEach(s => occupiedMap.add(s.toString()));
+            if (!Array.isArray(bookings)) return;
+            bookings.forEach(b => {
+                if (b.city === selectedCity && b.movieId === currentMovie.id && b.theatreId === selectedTheatre.id && b.date === selectedDate && b.time === selectedTime) {
+                    if (b.seats) {
+                        b.seats.forEach(sId => {
+                            if (seatDOMRefs[sId.toString()]) {
+                                seatDOMRefs[sId.toString()].classList.add("occupied");
+                            }
+                        });
                     }
-                });
-            }
-
-            SEAT_LAYOUT.forEach(catBlock => {
-                const header = document.createElement("div");
-                header.className = "category-header";
-                header.innerText = catBlock.category;
-                gridContainer.appendChild(header);
-
-                catBlock.rows.forEach(rowData => {
-                    const rowDiv = document.createElement("div");
-                    rowDiv.className = "seat-row";
-
-                    const label = document.createElement("div");
-                    label.className = "row-label";
-                    label.innerText = rowData.name;
-                    rowDiv.appendChild(label);
-
-                    const seatsWrapper = document.createElement("div");
-                    seatsWrapper.className = "row-seats";
-
-                    for (let sNum = rowData.count; sNum >= 1; sNum--) {
-                        const seatId = `${rowData.name}-${sNum}`;
-
-                        const seat = document.createElement("div");
-                        seat.className = "seat";
-                        seat.innerText = sNum;
-
-                        if (occupiedMap.has(seatId)) {
-                            seat.classList.add("occupied");
-                        } else {
-                            seat.onclick = () => {
-                                if (seat.classList.contains("selected")) {
-                                    seat.classList.remove("selected");
-                                    selectedSeats = selectedSeats.filter(s => s.id !== seatId);
-                                } else {
-                                    seat.classList.add("selected");
-                                    selectedSeats.push({ id: seatId, price: rowData.price });
-                                }
-                                calculatePrice();
-                            };
-                        }
-
-                        seatsWrapper.appendChild(seat);
-
-                        if (rowData.gaps.includes(sNum)) {
-                            const gap = document.createElement("div");
-                            gap.className = "seat.gap";
-                            gap.style.width = "28px";
-                            seatsWrapper.appendChild(gap);
-                        }
-                    }
-                    rowDiv.appendChild(seatsWrapper);
-                    gridContainer.appendChild(rowDiv);
-                });
+                }
             });
         })
-        .catch(err => console.error("Seating layout parsing issue:", err));
+        .catch(err => console.log("Fresh layout context initialized without server filtering."));
 }
 
 function calculatePrice() {
