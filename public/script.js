@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             appData = data;
             buildCityModal();
-            // Default select the first city automatically to load data cleanly
             selectCity(appData.cities[0]);
         });
 
@@ -56,7 +55,7 @@ function renderDashboard() {
             <div class="movie-info">
                 <h4 class="movie-title">${movie.title}</h4>
                 <div class="movie-meta">
-                    <span style="color:#10b981;">★ ${movie.rating}</span>
+                    <span style="color:#10b981; font-weight:bold;">★ ${movie.rating}</span>
                     <span>${movie.languages[0]}</span>
                 </div>
             </div>
@@ -78,19 +77,17 @@ function showDetails(movieId) {
     currentMovie = appData.movies.find(m => m.id === movieId);
     switchSection("section-details");
 
-    // Render detailed metadata card layouts
     document.getElementById("details-root").innerHTML = `
         <img class="details-img" src="${currentMovie.poster}">
         <div>
-            <h1 style="margin-top:0; color:#f43f5e;">${currentMovie.title}</h1>
-            <p style="font-size:18px; color:#10b981;">Rating: ★ ${currentMovie.rating}</p>
+            <h1 style="margin-top:0; color:#dc2626;">${currentMovie.title}</h1>
+            <p style="font-size:18px; color:#10b981; font-weight:bold;">Rating: ★ ${currentMovie.rating}</p>
             <p><strong>Cast:</strong> ${currentMovie.cast.join(", ")}</p>
             <p><strong>Formats:</strong> ${currentMovie.formats.join(" | ")}</p>
-            <p style="line-height:1.6; color:#9ca3af; margin-top:20px;">${currentMovie.description}</p>
+            <p style="line-height:1.6; color:#475569; margin-top:20px;">${currentMovie.description}</p>
         </div>
     `;
 
-    // Generate dynamic upcoming dates
     buildDatePills();
     buildTheatreTimings();
 }
@@ -114,7 +111,7 @@ function buildDatePills() {
         pill.innerText = dateString;
         pill.onclick = (e) => {
             document.querySelectorAll(".date-pill").forEach(p => p.classList.remove("selected"));
-            e.target.classList.add("selected");
+            pill.classList.add("selected");
             selectedDate = dateString;
         };
         container.appendChild(pill);
@@ -137,7 +134,7 @@ function buildTheatreTimings() {
         });
 
         row.innerHTML = `
-            <h4 style="margin-top:0; margin-bottom:12px; font-size:16px;">${theatre.name}</h4>
+            <h4 style="margin-top:0; margin-bottom:12px; font-size:16px; color:#0f172a;">${theatre.name}</h4>
             <div>${buttonsHtml}</div>
         `;
         container.appendChild(row);
@@ -149,7 +146,7 @@ function selectTimeSlot(theatreId, theatreName, time) {
     selectedTime = time;
     
     document.getElementById("seat-movie-title").innerText = `${currentMovie.title}`;
-    document.getElementById("seat-show-details").innerText = `📍 ${selectedCity} | 🏛️ ${theatreName} | 📅 ${selectedDate} at ⏰ ${time}`;
+    document.getElementById("seat-show-details").innerText = `📍 ${selectedCity}  •  🏛️ ${theatreName}  •  📅 ${selectedDate} at ⏰ ${time}`;
     
     selectedSeats = [];
     document.getElementById("total-price-display").innerText = "₹0";
@@ -162,11 +159,9 @@ function loadSeatGrid() {
     const container = document.getElementById("seats-container");
     container.innerHTML = "";
 
-    // Fetch existing collision logs from backend database
     fetch('/api/bookings')
         .then(res => res.json())
         .then(bookings => {
-            // Filter taken configurations matching current context
             const takenSeats = [];
             bookings.forEach(b => {
                 if(b.city === selectedCity && 
@@ -174,21 +169,18 @@ function loadSeatGrid() {
                    b.theatreId === selectedTheatre.id && 
                    b.date === selectedDate && 
                    b.time === selectedTime) {
-                    b.seats.forEach(s => takenSeats.push(s));
+                    b.seats.forEach(s => takenSeats.push(s.toString()));
                 }
             });
 
-            // Loop and draw the interactive grid elements
             for (let i = 1; i <= 40; i++) {
                 const seat = document.createElement("div");
                 seat.className = "seat";
                 seat.innerText = i;
                 
-                // Tier splitting: Seats 1-10 are VIP premium tiers
-                const isVip = i <= 10;
-                if(isVip) seat.classList.add("vip-seat");
+                if(i <= 10) seat.classList.add("vip-seat");
 
-                if(takenSeats.includes(i.toString()) || takenSeats.includes(i)) {
+                if(takenSeats.includes(i.toString())) {
                     seat.classList.add("occupied");
                 } else {
                     seat.onclick = () => {
@@ -204,7 +196,8 @@ function loadSeatGrid() {
                 }
                 container.appendChild(seat);
             }
-        });
+        })
+        .catch(err => console.error("Error loading bookings:", err));
 }
 
 function calculatePrice() {
@@ -254,15 +247,15 @@ function renderReceipt(ticket) {
 
     document.getElementById("receipt-root").innerHTML = `
         <h2 style="color:#10b981; margin-top:0;">Booking Confirmed! 🎉</h2>
-        <p style="font-size:13px; color:#9ca3af;">ID: ${ticket.id}</p>
-        <hr style="border:0; border-top:1px dashed #374151; margin:20px 0;">
-        <h3 style="margin:0; color:#f43f5e;">${ticket.movieTitle}</h3>
-        <p style="margin:6px 0;"><strong>City:</strong> ${ticket.city}</p>
-        <p style="margin:6px 0;"><strong>Theatre:</strong> ${ticket.theatreName}</p>
-        <p style="margin:6px 0;"><strong>Date:</strong> ${ticket.date}</p>
-        <p style="margin:6px 0;"><strong>Showtime:</strong> ${ticket.time}</p>
-        <p style="margin:6px 0;"><strong>Seats Chosen:</strong> ${ticket.seats.join(", ")}</p>
-        <hr style="border:0; border-top:1px dashed #374151; margin:20px 0;">
-        <h3 style="margin:0;">Paid: ₹${total}</h3>
+        <p style="font-size:13px; color:#64748b;">ID: ${ticket.id}</p>
+        <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0;">
+        <h3 style="margin:0; color:#dc2626; font-size:22px;">${ticket.movieTitle}</h3>
+        <p style="margin:8px 0;"><strong>City:</strong> ${ticket.city}</p>
+        <p style="margin:8px 0;"><strong>Theatre:</strong> ${ticket.theatreName}</p>
+        <p style="margin:8px 0;"><strong>Date:</strong> ${ticket.date}</p>
+        <p style="margin:8px 0;"><strong>Showtime:</strong> ${ticket.time}</p>
+        <p style="margin:8px 0;"><strong>Seats Chosen:</strong> ${ticket.seats.join(", ")}</p>
+        <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0;">
+        <h3 style="margin:0; font-size:20px; color:#0f172a;">Paid Amount: ₹${total}</h3>
     `;
 }
