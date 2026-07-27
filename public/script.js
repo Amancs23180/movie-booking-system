@@ -5,8 +5,9 @@ let selectedDate = "";
 let selectedTheatre = null;
 let selectedTime = "";
 let selectedSeats = [];
+let chosenPaymentMethod = "";
 
-// Clean layout matrix configurations
+// Unified BMS Layout Map Matrix
 const SEAT_LAYOUT = [
     { category: "₹1350 RECLINER", rows: [{ name: "K", count: 14, gaps: [2, 4, 6, 8, 10, 12], price: 1350 }] },
     { category: "₹540 PREMIUM", rows: [
@@ -32,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
             buildCityModal();
             selectCity(appData.cities[0]);
         })
-        .catch(err => console.error("Initialization data file fetch error:", err));
+        .catch(err => console.error("Initialization initialization setup error:", err));
 
     document.getElementById("nav-city-btn").addEventListener("click", () => {
         document.getElementById("city-modal").style.display = "flex";
@@ -156,7 +157,6 @@ function loadSeatGrid() {
     const gridContainer = document.getElementById("dynamic-seating-grid");
     gridContainer.innerHTML = "";
 
-    // Generate elements synchronously first so user can click regardless of networking state
     const seatDOMRefs = {};
 
     SEAT_LAYOUT.forEach(catBlock => {
@@ -211,7 +211,6 @@ function loadSeatGrid() {
         });
     });
 
-    // Layer bookings asynchronously onto DOM elements safely
     fetch('/api/bookings')
         .then(res => res.json())
         .then(bookings => {
@@ -228,21 +227,50 @@ function loadSeatGrid() {
                 }
             });
         })
-        .catch(err => console.log("Fresh layout context initialized without server filtering."));
+        .catch(err => console.log("Fresh framework tracking layout mapped."));
 }
 
 function calculatePrice() {
     let total = 0;
     selectedSeats.forEach(s => total += s.price);
     document.getElementById("total-price-display").innerText = `₹${total}`;
+    return total;
+}
+
+/* Payment Gateway View Controllers */
+function openPaymentModal() {
+    if (selectedSeats.length === 0) {
+        alert("Please select at least one seat before booking!");
+        return;
+    }
+    chosenPaymentMethod = "";
+    document.querySelectorAll(".payment-method").forEach(el => el.classList.remove("selected"));
+    
+    const amt = calculatePrice();
+    document.getElementById("payment-modal-amount").innerText = `₹${amt}`;
+    document.getElementById("payment-modal").style.display = "flex";
+}
+
+function closePaymentModal() {
+    document.getElementById("payment-modal").style.display = "none";
+}
+
+function selectPaymentMode(mode, element) {
+    chosenPaymentMethod = mode;
+    document.querySelectorAll(".payment-method").forEach(el => el.classList.remove("selected"));
+    element.classList.add("selected");
+}
+
+function confirmPaymentAndBook() {
+    if (!chosenPaymentMethod) {
+        alert("Please select a payment method option to proceed!");
+        return;
+    }
+    closePaymentModal();
+    processBooking();
 }
 
 function processBooking() {
-    if (selectedSeats.length === 0) {
-        alert("Please select at least one seat!");
-        return;
-    }
-
     const seatIds = selectedSeats.map(s => s.id);
     const payload = {
         movieId: currentMovie.id,
@@ -261,21 +289,55 @@ function processBooking() {
         body: JSON.stringify(payload)
     })
     .then(res => {
-        if (!res.ok) throw new Error("Some seats were taken just now!");
+        if (!res.ok) throw new Error("Some seats were booked in an overlapping transaction!");
         return res.json();
     })
     .then(ticket => {
         let total = 0;
         selectedSeats.forEach(s => total += s.price);
+        
+        // Render Premium High-Fidelity Confirmation Message Receipt Layout
         document.getElementById("receipt-root").innerHTML = `
-            <h2 style="color:#10b981; margin-top:0;">Booking Confirmed! 🎉</h2>
-            <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0;">
-            <h3 style="color:#dc2626; font-size:22px; margin:0 0 15px 0;">${ticket.movieTitle}</h3>
-            <p><strong>Theatre:</strong> ${ticket.theatreName}</p>
-            <p><strong>Date & Time:</strong> ${ticket.date} at ${ticket.time}</p>
-            <p><strong>Seats Chosen:</strong> ${ticket.seats.join(", ")}</p>
-            <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0;">
-            <h3>Total Paid: ₹${total}</h3>
+            <div class="ticket-header">
+                <h2 style="margin:0; font-size:22px; letter-spacing:0.5px;">Ticket Confirmed! 🎉</h2>
+                <p style="margin:5px 0 0 0; opacity:0.9; font-size:13px;">Booking ID: ${ticket.id || 'BMS-' + Math.floor(100000 + Math.random() * 900000)}</p>
+            </div>
+            <div class="ticket-body">
+                <div style="text-align:center; margin-bottom:20px;">
+                    <h3 style="color:#0f172a; margin:0; font-size:22px; font-weight:700;">${ticket.movieTitle}</h3>
+                    <p style="margin:5px 0 0 0; color:#10b981; font-weight:700; font-size:14px;">🌟 English (3D)</p>
+                </div>
+                
+                <div class="ticket-row-info">
+                    <span class="ticket-label">Cinema</span>
+                    <span class="ticket-value">${ticket.theatreName}</span>
+                </div>
+                <div class="ticket-row-info">
+                    <span class="ticket-label">City</span>
+                    <span class="ticket-value">${ticket.city}</span>
+                </div>
+                <div class="ticket-row-info">
+                    <span class="ticket-label">Date & Time</span>
+                    <span class="ticket-value">${ticket.date} | ${ticket.time}</span>
+                </div>
+                <div class="ticket-row-info">
+                    <span class="ticket-label">Seats</span>
+                    <span class="ticket-value" style="color:#10b981;">${ticket.seats.join(", ")}</span>
+                </div>
+                <div class="ticket-row-info">
+                    <span class="ticket-label">Payment Mode</span>
+                    <span class="ticket-value" style="text-transform: uppercase;">${chosenPaymentMethod}</span>
+                </div>
+                
+                <div class="ticket-total-box">
+                    <span style="font-weight:700; color:#475569; font-size:15px;">Total Paid</span>
+                    <span style="font-weight:800; color:#0f172a; font-size:20px;">₹${total}</span>
+                </div>
+                
+                <p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:25px; margin-bottom:0; font-style:italic;">
+                    Show this digital ticket at the entrance counter. Enjoy your movie!
+                </p>
+            </div>
         `;
         switchSection("section-receipt");
     })
