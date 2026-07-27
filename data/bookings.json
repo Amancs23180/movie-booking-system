@@ -1,28 +1,41 @@
-[
-  {
-    "movie": "Oppenheimer",
-    "name": "aman pandey",
-    "seats": "10"
+{
+  "cities": {
+    "nagpur": {
+      "theatres": [
+        {
+          "id": "pvr-empress",
+          "name": "PVR: Empress Mall, Nagpur",
+          "screens": ["2D", "3D Dolby Atmos"]
+        },
+        {
+          "id": "inox-poonam",
+          "name": "INOX: Poonam Mall, Nagpur",
+          "screens": ["2D", "IMAX 3D"]
+        }
+      ]
+    }
   },
-  {
-    "movie": "Avatar: The Way of Water",
-    "name": "Aman Pandey",
-    "seats": "2"
-  },
-  {
-    "movie": "Oppenheimer",
-    "date": "Tuesday, 28 July",
-    "time": "12:30 PM",
-    "ticketClass": "VIP Recliner (₹400)",
-    "name": "Aman Pandey",
-    "seats": "2"
-  },
-  {
-    "movie": "Dhurandhar",
-    "date": "Today, 26 July",
-    "time": "12:30 PM",
-    "ticketClass": "Normal (₹180)",
-    "name": "aman",
-    "seats": "2"
-  }
-]
+  "movies": [
+    {
+      "id": "spiderman",
+      "title": "Spider-Man: No Way Home",
+      "rating": "9.2/10",
+      "languages": ["English", "Hindi"],
+      "formats": ["2D", "3D Dolby"],
+      "cast": ["Tom Holland", "Zendaya"],
+      "poster": "/images/spiderman.jpg",
+      "description": "Peter Parker seeks the help of Doctor Strange..."
+    },
+    {
+      "id": "dhamaal4",
+      "title": "Dhamaal 4",
+      "rating": "8.5/10",
+      "languages": ["Hindi"],
+      "formats": ["2D"],
+      "cast": ["Ajay Devgn", "Riteish Deshmukh", "Arshad Warsi"],
+      "poster": "/images/dhamaal4.jpg",
+      "description": "The ultimate comedy franchise returns with a wild new treasure hunt."
+    }
+  ],
+  "bookings": []
+}

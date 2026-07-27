@@ -4,60 +4,80 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to serve static files from the public folder and parse incoming JSON data
-app.use(express.static(path.join(__dirname, 'public')));
+const DATA_FILE = path.join(__dirname, 'data.json');
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-const DATA_FILE = path.join(__dirname, 'data', 'bookings.json');
+// Helper function to read database safely
+function readData() {
+    try {
+        const data = fs.readFileSync(DATA_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (err) {
+        return { cities: [], movies: [], theatres: [], bookings: [] };
+    }
+}
 
-// Route to handle new ticket bookings
-app.post('/book', (req, res) => {
-    const { movie, seats, name, email } = req.body;
+// Helper function to write database safely
+function writeData(data) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
 
-    // Validate inputs basic check
-    if (!movie || !seats || !name || !email) {
-        return res.status(400).json({ success: false, message: "All fields are required!" });
+// 1. Get initial layout options (Cities, Movies, Theatres)
+app.get('/api/initial-data', (req, res) => {
+    const db = readData();
+    res.json({ cities: db.cities, movies: db.movies, theatres: db.theatres });
+});
+
+// 2. Get already booked seats for a specific showtime to disable them in UI
+app.get('/api/booked-seats', (req, res) => {
+    const { movie, theatre, time } = req.query;
+    const db = readData();
+    
+    const filledSeats = db.bookings
+        .filter(b => b.movieId === movie && b.theatreId === theatre && b.showtime === time)
+        .reduce((acc, b) => acc.concat(b.seats), []);
+
+    res.json({ bookedSeats: filledSeats });
+});
+
+// 3. Process the entire dynamic booking payload
+app.post('/api/book', (req, res) => {
+    const { name, email, city, movieId, theatreId, showtime, seats, totalPrice } = req.body;
+
+    if (!name || !email || !seats || seats.length === 0) {
+        return res.status(400).json({ success: false, message: "Missing required fields." });
     }
 
-    // Generate a clean ticket receipt object
+    const db = readData();
+
+    // Secondary backend check to prevent seat double-booking collisions
+    const isOverlap = db.bookings
+        .filter(b => b.movieId === movieId && b.theatreId === theatreId && b.showtime === showtime)
+        .some(b => b.seats.some(s => seats.includes(s)));
+
+    if (isOverlap) {
+        return res.status(400).json({ success: false, message: "One or more selected seats were just booked by another user." });
+    }
+
     const newBooking = {
-        id: "TKT-" + Math.floor(100000 + Math.random() * 900000), 
-        movie,
-        seats,
+        bookingId: 'BMS-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
         name,
         email,
-        date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+        city,
+        movieId,
+        theatreId,
+        showtime,
+        seats,
+        totalPrice,
+        timestamp: new Date().toLocaleString()
     };
 
-    // Read existing database file
-    let bookings = [];
-    if (fs.existsSync(DATA_FILE)) {
-        try {
-            const data = fs.readFileSync(DATA_FILE, 'utf8');
-            bookings = data ? JSON.parse(data) : [];
-        } catch (err) {
-            console.error("Error reading JSON database:", err);
-        }
-    }
+    db.bookings.push(newBooking);
+    writeData(db);
 
-    // Append new ticket and save to the local file system
-    bookings.push(newBooking);
-    try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(bookings, null, 2));
-    } catch (err) {
-        console.error("Error writing to JSON database:", err);
-        return res.status(500).json({ success: false, message: "Database save error." });
-    }
-
-    // Send back the complete success response containing the digital ticket receipt
-    res.status(200).json({
-        success: true,
-        message: "Booking Confirmed Successfully!",
-        receipt: newBooking
-    });
+    res.status(200).json({ success: true, booking: newBooking });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running smoothly on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`BookMyShow engine running on port ${PORT}`));

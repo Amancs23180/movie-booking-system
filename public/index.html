@@ -3,219 +3,334 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CinePass - Movie Ticket Booking</title>
+    <title>BookMyShow Pro</title>
     <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-dark: #1e293b;
+            --primary-accent: #f84464;
+            --text-light: #f8fafc;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e1e2f 0%, #111119 100%);
-            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
             margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            padding: 0;
         }
-
-        .container {
-            background-color: #252538;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 450px;
-            padding: 30px;
-            box-sizing: border-box;
-        }
-
-        h2 {
-            text-align: center;
-            margin-top: 0;
-            color: #ff4757;
-            letter-spacing: 1px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #a4b0be;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #3d3d5c;
-            border-radius: 6px;
-            background-color: #1e1e2f;
-            color: #fff;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #ff4757;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            background-color: #ff4757;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #e84118;
-        }
-
-        /* Digital Receipt Ticket Styling */
-        .ticket-receipt {
-            background-color: #ffffff;
-            color: #2f3542;
-            padding: 24px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 2px dashed #ff4757;
-            position: relative;
-            font-family: 'Courier New', Courier, monospace;
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        .ticket-receipt h3 {
-            text-align: center;
-            margin-top: 0;
-            color: #ff4757;
-            font-family: sans-serif;
-        }
-
-        .ticket-line {
-            border-top: 1px dashed #747d8c;
-            margin: 15px 0;
-        }
-
-        .ticket-row {
+        header {
+            background-color: var(--panel-dark);
+            padding: 15px 5%;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
+            align-items: center;
+            border-bottom: 1px solid #334155;
         }
+        .brand { font-size: 24px; font-weight: bold; color: var(--primary-accent); }
+        select { background: #334155; color: white; border: none; padding: 8px 15px; border-radius: 4px; }
+        .container { width: 90%; max-width: 1200px; margin: 30px auto; }
+        
+        /* Views */
+        .view { display: none; }
+        .view.active { display: block; }
 
-        .hidden {
-            display: none;
-        }
+        /* Movie Grid Layout */
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
+        .movie-card { background: var(--panel-dark); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+        .movie-card:hover { transform: translateY(-5px); }
+        .movie-card img { width: 100%; height: 350px; object-fit: cover; }
+        .movie-info { padding: 15px; }
+        .rating { color: #f59e0b; font-weight: bold; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* Detail Page Components */
+        .detail-flex { display: flex; gap: 40px; background: var(--panel-dark); padding: 30px; border-radius: 12px; }
+        .detail-flex img { width: 300px; border-radius: 8px; }
+        .meta-tag { background: #334155; padding: 4px 10px; border-radius: 15px; font-size: 13px; margin-right: 5px; }
+
+        /* Theatre Matrix selection */
+        .theatre-row { background: var(--panel-dark); padding: 20px; border-radius: 8px; margin-bottom: 15px; }
+        .time-btn { background: #334155; color: white; border: 1px solid #475569; padding: 8px 16px; margin: 5px; border-radius: 4px; cursor: pointer; }
+        .time-btn:hover { background: var(--primary-accent); }
+
+        /* Visual Seat Grid */
+        .screen-banner { width: 70%; background: #475569; text-align: center; margin: 20px auto 40px auto; padding: 5px; color: #94a3b8; font-size: 12px; box-shadow: 0 4px 12px rgba(255,255,255,0.1); }
+        .seat-container { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .seat-row { display: flex; gap: 8px; align-items: center; }
+        .row-label { width: 30px; font-weight: bold; color: #64748b; }
+        .seat { width: 30px; height: 30px; background: #334155; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+        .seat.selected { background: #10b981 !important; }
+        .seat.booked { background: #ef4444 !important; cursor: not-allowed; opacity: 0.6; }
+        .vip .seat { background: #b45309; }
+
+        /* Checkout layout box */
+        .checkout-box { margin-top: 30px; background: var(--panel-dark); padding: 20px; border-radius: 8px; text-align: center; }
+        .btn-confirm { background: var(--primary-accent); border: none; color: white; padding: 12px 30px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        /* Receipt Template Frame */
+        .receipt-card { background: white; color: #1e293b; max-width: 500px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .receipt-header { background: var(--primary-accent); color: white; padding: 20px; text-align: center; }
+        .receipt-body { padding: 30px; line-height: 1.6; }
+        .receipt-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding: 10px 0; }
     </style>
 </head>
 <body>
 
+    <header>
+        <div class="brand" onclick="showView('home-view')">BookMyShow Pro</div>
+        <div>
+            <select id="city-selector" onchange="updateCity()"></select>
+        </div>
+    </header>
+
     <div class="container">
-        <h2>🎟️ Movie Booking</h2>
-        
-        <!-- Form Component -->
-        <form id="bookingForm">
-            <div class="form-group">
-                <label for="movie">Select Movie</label>
-                <select id="movie" required>
-                    <option value="" disabled selected>Choose a movie...</option>
-                    <option value="Avatar: The Way of Water">Avatar: The Way of Water</option>
-                    <option value="Oppenheimer">Oppenheimer</option>
-                    <option value="Spider-Man: Across the Spider-Verse">Spider-Man: Across the Spider-Verse</option>
-                    <option value="The Dark Knight">The Dark Knight</option>
-                </select>
+        <!-- 1. HOME VIEW (MOVIE DASHBOARD) -->
+        <div id="home-view" class="view active">
+            <h2>Recommended Movies</h2>
+            <div class="movie-grid" id="movie-grid-container"></div>
+        </div>
+
+        <!-- 2. DETAILS & THEATRE SELECTION VIEW -->
+        <div id="details-view" class="view">
+            <button class="time-btn" onclick="showView('home-view')">← Back to Movies</button>
+            <div class="detail-flex" id="movie-details-container" style="margin-top: 20px;"></div>
+            
+            <h3 style="margin-top: 40px;">Select Cinema & Showtime</h3>
+            <div id="theatre-container"></div>
+        </div>
+
+        <!-- 3. VISUAL SEAT MAP VIEW -->
+        <div id="seat-view" class="view">
+            <button class="time-btn" onclick="showView('details-view')">← Back to Showtimes</button>
+            <h2 id="seat-view-title" style="text-align: center;">Choose Seats</h2>
+            
+            <div class="screen-banner">All Eyes This Way: SCREEN HERE</div>
+            
+            <div class="seat-container" id="visual-seat-matrix"></div>
+
+            <div class="checkout-box">
+                <p>Selected Seats: <span id="display-selected-seats" style="font-weight: bold; color: #10b981;">None</span></p>
+                <h3>Total Price: ₹<span id="display-total-price">0</span></h3>
+                <div style="margin-top: 15px;">
+                    <input type="text" id="user-name" placeholder="Enter Your Name" style="padding: 10px; border-radius: 4px; border: none; width: 200px; margin-right: 10px;">
+                    <input type="email" id="user-email" placeholder="Enter Email" style="padding: 10px; border-radius: 4px; border: none; width: 200px; margin-right: 10px;">
+                    <button class="btn-confirm" onclick="submitFinalBooking()">Book Tickets Now</button>
+                </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label for="seats">Number of Seats</label>
-                <input type="number" id="seats" min="1" max="10" placeholder="e.g. 2" required>
+        <!-- 4. FINAL RECEIPT VIEW -->
+        <div id="receipt-view" class="view">
+            <div class="receipt-card" id="receipt-target"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn-confirm" onclick="location.reload()">Book Another Ticket</button>
             </div>
-
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" placeholder="John Doe" required>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="john@example.com" required>
-            </div>
-
-            <button type="submit">Confirm Reservation</button>
-        </form>
-
-        <!-- Dynamic Success Receipt Target Container -->
-        <div id="receiptContainer" class="hidden"></div>
+        </div>
     </div>
 
     <script>
-        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Frontend global application state cache
+        let appState = {
+            cities: [], movies: [], theatres: [],
+            selectedCity: '', selectedMovie: null, selectedTheatre: null, selectedShowtime: '',
+            selectedSeats: [], totalPrice: 0
+        };
 
-            // Assemble application form configuration values
+        const ROW_CONFIG = [
+            { label: 'VIP', count: 10, price: 300, class: 'vip' },
+            { label: 'A', count: 12, price: 150, class: 'normal' },
+            { label: 'B', count: 12, price: 150, class: 'normal' },
+            { label: 'C', count: 12, price: 120, class: 'normal' }
+        ];
+
+        window.onload = async () => {
+            const res = await fetch('/api/initial-data');
+            const data = await res.json();
+            
+            appState.cities = data.cities;
+            appState.movies = data.movies;
+            appState.theatres = data.theatres;
+
+            // Render City Dropdown options dynamically
+            const selector = document.getElementById('city-selector');
+            data.cities.forEach(city => {
+                selector.innerHTML += `<option value="${city}">${city}</option>`;
+            });
+            appState.selectedCity = data.cities[0];
+            
+            renderMovies();
+        };
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        function updateCity() {
+            appState.selectedCity = document.getElementById('city-selector').value;
+            renderMovies();
+            showView('home-view');
+        }
+
+        function renderMovies() {
+            const container = document.getElementById('movie-grid-container');
+            container.innerHTML = '';
+            appState.movies.forEach(movie => {
+                container.innerHTML += `
+                    <div class="movie-card" onclick="selectMovie('${movie.id}')">
+                        <img src="${movie.poster}" alt="${movie.title}">
+                        <div class="movie-info">
+                            <h4>${movie.title}</h4>
+                            <p class="rating">⭐ ${movie.rating}</p>
+                            <p style="font-size: 12px; color: #94a3b8;">${movie.languages.join(', ')}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function selectMovie(movieId) {
+            const movie = appState.movies.find(m => m.id === movieId);
+            appState.selectedMovie = movie;
+
+            const detailsContainer = document.getElementById('movie-details-container');
+            detailsContainer.innerHTML = `
+                <img src="${movie.poster}">
+                <div>
+                    <h1>${movie.title}</h1>
+                    <p class="rating" style="font-size: 20px;">⭐ ${movie.rating}</p>
+                    <p>${movie.description}</p>
+                    <p><strong>Cast:</strong> ${movie.cast.join(', ')}</p>
+                    <div>
+                        ${movie.formats.map(f => `<span class="meta-tag">${f}</span>`).join('')}
+                        ${movie.languages.map(l => `<span class="meta-tag">${l}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+
+            const theatreContainer = document.getElementById('theatre-container');
+            theatreContainer.innerHTML = '';
+            appState.theatres.forEach(t => {
+                theatreContainer.innerHTML += `
+                    <div class="theatre-row">
+                        <h4>${t.name}</h4>
+                        <button class="time-btn" onclick="selectShowtime('${t.id}', '12:00 PM')">12:00 PM</button>
+                        <button class="time-btn" onclick="selectShowtime('${t.id}', '03:30 PM')">03:30 PM</button>
+                        <button class="time-btn" onclick="selectShowtime('${t.id}', '09:00 PM')">09:00 PM</button>
+                    </div>
+                `;
+            });
+            showView('details-view');
+        }
+
+        async function selectShowtime(theatreId, time) {
+            appState.selectedTheatre = appState.theatres.find(t => t.id === theatreId);
+            appState.selectedShowtime = time;
+            appState.selectedSeats = [];
+            appState.totalPrice = 0;
+
+            document.getElementById('seat-view-title').innerText = `${appState.selectedMovie.title} - ${appState.selectedTheatre.name} (@ ${time})`;
+            
+            // Fetch already locked seats from server
+            const res = await fetch(`/api/booked-seats?movie=${appState.selectedMovie.id}&theatre=${theatreId}&time=${time}`);
+            const { bookedSeats } = await res.json();
+
+            renderSeatMatrix(bookedSeats);
+            updateCheckoutUI();
+            showView('seat-view');
+        }
+
+        function renderSeatMatrix(bookedSeats) {
+            const matrix = document.getElementById('visual-seat-matrix');
+            matrix.innerHTML = '';
+
+            ROW_CONFIG.forEach(row => {
+                let rowHtml = `<div class="seat-row ${row.class}"><span class="row-label">${row.label}</span>`;
+                for (let i = 1; i <= row.count; i++) {
+                    const seatId = `${row.label}-${i}`;
+                    const isBooked = bookedSeats.includes(seatId);
+                    rowHtml += `<div class="seat ${isBooked ? 'booked' : ''}" data-seat="${seatId}" data-price="${row.price}" onclick="toggleSeat(this)">${i}</div>`;
+                }
+                rowHtml += `</div>`;
+                matrix.innerHTML += rowHtml;
+            });
+        }
+
+        function toggleSeat(seatElem) {
+            if (seatElem.classList.contains('booked')) return;
+
+            const seatId = seatElem.getAttribute('data-seat');
+            const price = parseInt(seatElem.getAttribute('data-price'));
+
+            if (seatElem.classList.contains('selected')) {
+                seatElem.classList.remove('selected');
+                appState.selectedSeats = appState.selectedSeats.filter(s => s !== seatId);
+                appState.totalPrice -= price;
+            } else {
+                seatElem.classList.add('selected');
+                appState.selectedSeats.push(seatId);
+                appState.totalPrice += price;
+            }
+            updateCheckoutUI();
+        }
+
+        function updateCheckoutUI() {
+            document.getElementById('display-selected-seats').innerText = appState.selectedSeats.length ? appState.selectedSeats.join(', ') : 'None';
+            document.getElementById('display-total-price').innerText = appState.totalPrice;
+        }
+
+        async function submitFinalBooking() {
+            const name = document.getElementById('user-name').value;
+            const email = document.getElementById('user-email').value;
+
+            if (!name || !email || appState.selectedSeats.length === 0) {
+                alert('Please provide your details and select at least one seat.');
+                return;
+            }
+
             const payload = {
-                movie: document.getElementById('movie').value,
-                seats: document.getElementById('seats').value,
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value
+                name, email,
+                city: appState.selectedCity,
+                movieId: appState.selectedMovie.id,
+                theatreId: appState.selectedTheatre.id,
+                showtime: appState.selectedShowtime,
+                seats: appState.selectedSeats,
+                totalPrice: appState.totalPrice
             };
 
-            try {
-                // Post payload straight to backend
-                const response = await fetch('/book', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            const res = await fetch('/api/book', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-                const data = await response.json();
-
-                if (data.success) {
-                    const form = document.getElementById('bookingForm');
-                    const receiptContainer = document.getElementById('receiptContainer');
-
-                    // Smooth transition: Hide the entry form fields
-                    form.classList.add('hidden');
-
-                    // Inject structured booking details card component layout
-                    receiptContainer.innerHTML = `
-                        <div class="ticket-receipt">
-                            <h3>BOOKING CONFIRMED</h3>
-                            <div class="ticket-line"></div>
-                            <div class="ticket-row"><strong>TICKET ID:</strong> <span>${data.receipt.id}</span></div>
-                            <div class="ticket-row"><strong>MOVIE:</strong> <span>${data.receipt.movie}</span></div>
-                            <div class="ticket-row"><strong>SEATS:</strong> <span>${data.receipt.seats} Ticket(s)</span></div>
-                            <div class="ticket-row"><strong>NAME:</strong> <span>${data.receipt.name}</span></div>
-                            <div class="ticket-row"><strong>DATE:</strong> <span>${data.receipt.date}</span></div>
-                            <div class="ticket-line"></div>
-                            <p style="text-align:center; margin-bottom:0; font-size:12px;">Scan at counter. Enjoy your show! 🍿</p>
-                        </div>
-                        <button onclick="window.location.reload()" style="margin-top: 20px; background-color: #3d3d5c;">Book Another Ticket</button>
-                    `;
-
-                    // Present output container interface
-                    receiptContainer.classList.remove('hidden');
-                } else {
-                    alert("Error processing ticket: " + data.message);
-                }
-            } catch (error) {
-                console.error("Networking error:", error);
-                alert("Could not connect to the backend booking service.");
+            const result = await res.json();
+            if (result.success) {
+                renderReceipt(result.booking);
+                showView('receipt-view');
+            } else {
+                alert(result.message || 'Booking failed execution.');
             }
-        });
+        }
+
+        function renderReceipt(b) {
+            const target = document.getElementById('receipt-target');
+            target.innerHTML = `
+                <div class="receipt-header">
+                    <h3>BOOKING CONFIRMED</h3>
+                    <p>ID: ${b.bookingId}</p>
+                </div>
+                <div class="receipt-body">
+                    <div class="receipt-row"><span>Movie</span><strong>${appState.selectedMovie.title}</strong></div>
+                    <div class="receipt-row"><span>Cinema</span><strong>${appState.selectedTheatre.name}</strong></div>
+                    <div class="receipt-row"><span>City</span><strong>${b.city}</strong></div>
+                    <div class="receipt-row"><span>Showtime</span><strong>${b.showtime}</strong></div>
+                    <div class="receipt-row"><span>Seats</span><strong>${b.seats.join(', ')}</strong></div>
+                    <div class="receipt-row"><span>Name</span><strong>${b.name}</strong></div>
+                    <div class="receipt-row" style="border:none; margin-top:15px; font-size:18px;"><span>Total Paid</span><strong style="color:#f84464;">₹${b.totalPrice}</strong></div>
+                    <p style="font-size:11px; color:#64748b; text-align:center; margin-top:20px;">Booked on: ${b.timestamp}</p>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
