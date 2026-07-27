@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
             appData = data;
             buildCityModal();
             selectCity(appData.cities[0]);
-        });
+        })
+        .catch(err => console.error("Error loading initialization data:", err));
 
     document.getElementById("nav-city-btn").addEventListener("click", () => {
         document.getElementById("city-modal").style.display = "flex";
@@ -159,45 +160,63 @@ function loadSeatGrid() {
     const container = document.getElementById("seats-container");
     container.innerHTML = "";
 
+    // Step 1: Generate the seats immediately so they are always visible
+    const totalSeatsCount = 40;
+    const seatElements = {};
+
+    for (let i = 1; i <= totalSeatsCount; i++) {
+        const seat = document.createElement("div");
+        seat.className = "seat";
+        seat.innerText = i;
+        
+        // Rows mapping: 1-10 (Row A - VIP), 11-20 (Row B), 21-30 (Row C), 31-40 (Row D)
+        if (i <= 10) {
+            seat.classList.add("vip-seat");
+        }
+
+        seat.onclick = () => {
+            if (seat.classList.contains("occupied")) return;
+            
+            if (seat.classList.contains("selected")) {
+                seat.classList.remove("selected");
+                selectedSeats = selectedSeats.filter(s => s !== i);
+            } else {
+                seat.classList.add("selected");
+                selectedSeats.push(i);
+            }
+            calculatePrice();
+        };
+
+        container.appendChild(seat);
+        seatElements[i.toString()] = seat;
+    }
+
+    // Step 2: Fetch bookings safely without breaking layout if database is empty or offline
     fetch('/api/bookings')
         .then(res => res.json())
         .then(bookings => {
-            const takenSeats = [];
+            if (!Array.isArray(bookings)) return;
+            
             bookings.forEach(b => {
-                if(b.city === selectedCity && 
-                   b.movieId === currentMovie.id && 
-                   b.theatreId === selectedTheatre.id && 
-                   b.date === selectedDate && 
-                   b.time === selectedTime) {
-                    b.seats.forEach(s => takenSeats.push(s.toString()));
+                if (b.city === selectedCity && 
+                    b.movieId === currentMovie.id && 
+                    b.theatreId === selectedTheatre.id && 
+                    b.date === selectedDate && 
+                    b.time === selectedTime) {
+                    
+                    if (b.seats && Array.isArray(b.seats)) {
+                        b.seats.forEach(s => {
+                            const seatKey = s.toString();
+                            if (seatElements[seatKey]) {
+                                seatElements[seatKey].classList.add("occupied");
+                                seatElements[seatKey].classList.remove("selected");
+                            }
+                        });
+                    }
                 }
             });
-
-            for (let i = 1; i <= 40; i++) {
-                const seat = document.createElement("div");
-                seat.className = "seat";
-                seat.innerText = i;
-                
-                if(i <= 10) seat.classList.add("vip-seat");
-
-                if(takenSeats.includes(i.toString())) {
-                    seat.classList.add("occupied");
-                } else {
-                    seat.onclick = () => {
-                        if(seat.classList.contains("selected")) {
-                            seat.classList.remove("selected");
-                            selectedSeats = selectedSeats.filter(s => s !== i);
-                        } else {
-                            seat.classList.add("selected");
-                            selectedSeats.push(i);
-                        }
-                        calculatePrice();
-                    };
-                }
-                container.appendChild(seat);
-            }
         })
-        .catch(err => console.error("Error loading bookings:", err));
+        .catch(err => console.log("No existing bookings found, starting with clean layout."));
 }
 
 function calculatePrice() {
