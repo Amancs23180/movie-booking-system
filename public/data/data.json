@@ -1,6 +1,26 @@
 {
-  "cities": ["Nagpur", "Mumbai", "Delhi"],
+  "cities": ["Nagpur", "Mumbai", "Delhi", "Jaipur", "Kolkata", "Prayagraj", "Ahmedabad"],
   "movies": [
+    {
+      "id": "dhurandhar2",
+      "title": "Dhurandhar 2",
+      "rating": "9.4/10",
+      "languages": ["Hindi", "English"],
+      "formats": ["3D Dolby Atmos", "IMAX 2D"],
+      "cast": ["Ranveer Singh", "Sanjay Dutt", "R. Madhavan"],
+      "poster": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500",
+      "description": "The high-octane espionage sequel returns as covert agents face a global threat across international borders."
+    },
+    {
+      "id": "toxic",
+      "title": "Toxic: A Fairy Tale for Grown-ups",
+      "rating": "9.1/10",
+      "languages": ["Kannada", "Hindi", "Telugu"],
+      "formats": ["2D", "IMAX 3D"],
+      "cast": ["Yash", "Kiara Advani"],
+      "poster": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500",
+      "description": "A stylish, action-packed underworld saga set in the backdrop of the mafia and the dark alleys of the city."
+    },
     {
       "id": "spiderman",
       "title": "Spider-Man: No Way Home",
@@ -10,21 +30,11 @@
       "cast": ["Tom Holland", "Zendaya"],
       "poster": "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=500",
       "description": "Peter Parker seeks the help of Doctor Strange to make the world forget his secret identity."
-    },
-    {
-      "id": "dhamaal4",
-      "title": "Dhamaal 4",
-      "rating": "8.5/10",
-      "languages": ["Hindi"],
-      "formats": ["2D"],
-      "cast": ["Ajay Devgn", "Arshad Warsi", "Riteish Deshmukh"],
-      "poster": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500",
-      "description": "The ultimate comedy franchise returns with a wild new treasure hunt across the country."
     }
   ],
   "theatres": [
-    { "id": "pvr-empress", "name": "PVR: Empress Mall, Nagpur" },
-    { "id": "inox-poonam", "name": "INOX: Poonam Mall, Wardhaman Nagar" }
+    { "id": "pvr-empress", "name": "PVR: Empress Mall" },
+    { "id": "inox-poonam", "name": "INOX: Poonam Mall" }
   ],
   "bookings": []
 }
