@@ -3,124 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineVerse | Premium Ticket Booking</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>CinePass - Movie Ticket Booking</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2f 0%, #111119 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #252538;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #ff4757;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #a4b0be;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #3d3d5c;
+            border-radius: 6px;
+            background-color: #1e1e2f;
+            color: #fff;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff4757;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #ff4757;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e84118;
+        }
+
+        /* Digital Receipt Ticket Styling */
+        .ticket-receipt {
+            background-color: #ffffff;
+            color: #2f3542;
+            padding: 24px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px dashed #ff4757;
+            position: relative;
+            font-family: 'Courier New', Courier, monospace;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .ticket-receipt h3 {
+            text-align: center;
+            margin-top: 0;
+            color: #ff4757;
+            font-family: sans-serif;
+        }
+
+        .ticket-line {
+            border-top: 1px dashed #747d8c;
+            margin: 15px 0;
+        }
+
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-    <div class="glass-container">
-        <header>
-            <h1>🎬 CINE<span>VERSE</span></h1>
-            <p class="subtitle">Experience Cinema in Luxury</p>
-        </header>
 
-        <main class="main-content">
-            <!-- Left Side: Interactive Booking Form -->
-            <section class="form-section">
-                <h3>Select Your Experience</h3>
-                <form id="bookForm">
-                    <div class="input-group">
-                        <label for="movie">Now Showing</label>
-                        <select id="movie" required>
-                            <option value="Dhurandhar">Dhurandhar (Action/Drama)</option>
-                            <option value="Chhava">Chhava (Historical Epic)</option>
-                            <option value="Singham Again">Singham Again (Masala/Action)</option>
-                            <option value="Oppenheimer">Oppenheimer (70mm IMAX)</option>
-                        </select>
-                    </div>
+    <div class="container">
+        <h2>🎟️ Movie Booking</h2>
+        
+        <!-- Form Component -->
+        <form id="bookingForm">
+            <div class="form-group">
+                <label for="movie">Select Movie</label>
+                <select id="movie" required>
+                    <option value="" disabled selected>Choose a movie...</option>
+                    <option value="Avatar: The Way of Water">Avatar: The Way of Water</option>
+                    <option value="Oppenheimer">Oppenheimer</option>
+                    <option value="Spider-Man: Across the Spider-Verse">Spider-Man: Across the Spider-Verse</option>
+                    <option value="The Dark Knight">The Dark Knight</option>
+                </select>
+            </div>
 
-                    <div class="row-inputs">
-                        <div class="input-group">
-                            <label for="date">Select Date</label>
-                            <select id="date" required>
-                                <option value="Today, 26 July">Today, 26 July</option>
-                                <option value="Tomorrow, 27 July">Tomorrow, 27 July</option>
-                                <option value="Tuesday, 28 July">Tuesday, 28 July</option>
-                            </select>
-                        </div>
+            <div class="form-group">
+                <label for="seats">Number of Seats</label>
+                <input type="number" id="seats" min="1" max="10" placeholder="e.g. 2" required>
+            </div>
 
-                        <div class="input-group">
-                            <label for="time">Showtime</label>
-                            <select id="time" required>
-                                <option value="12:30 PM">12:30 PM (👇 20% Off)</option>
-                                <option value="04:15 PM">04:15 PM</option>
-                                <option value="07:45 PM">07:45 PM (Prime Time)</option>
-                                <option value="10:30 PM">10:30 PM</option>
-                            </select>
-                        </div>
-                    </div>
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="John Doe" required>
+            </div>
 
-                    <div class="row-inputs">
-                        <div class="input-group">
-                            <label for="ticketClass">Seat Class</label>
-                            <select id="ticketClass" required>
-                                <option value="Normal (₹180)">Normal (₹180)</option>
-                                <option value="Premium (₹250)">Premium (₹250)</option>
-                                <option value="VIP Recliner (₹400)">VIP Recliner (₹400)</option>
-                            </select>
-                        </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="john@example.com" required>
+            </div>
 
-                        <div class="input-group">
-                            <label for="seats">Seats</label>
-                            <input type="number" id="seats" placeholder="Qty" min="1" max="10" required>
-                        </div>
-                    </div>
+            <button type="submit">Confirm Reservation</button>
+        </form>
 
-                    <div class="input-group">
-                        <label for="name">Viewer Name</label>
-                        <input type="text" id="name" placeholder="e.g. Aman Pandey" required>
-                    </div>
-
-                    <button type="submit" class="btn-primary">Confirm Reservation</button>
-                </form>
-            </section>
-
-            <!-- Right Side: Live Premium Ticket Feed -->
-            <section class="feed-section">
-                <h3>Live Reservations</h3>
-                <div class="list-wrapper">
-                    <ul id="list"></ul>
-                </div>
-            </section>
-        </main>
+        <!-- Dynamic Success Receipt Target Container -->
+        <div id="receiptContainer" class="hidden"></div>
     </div>
 
     <script>
-        const form = document.getElementById('bookForm');
-        
-        async function load() {
-            const res = await fetch('/api/bookings');
-            const data = await res.json();
-            document.getElementById('list').innerHTML = data.map(b => `
-                <li class="ticket-card">
-                    <div class="ticket-info">
-                        <h4>${b.movie}</h4>
-                        <p class="ticket-meta">📅 ${b.date} | ⏰ ${b.time}</p>
-                        <p class="ticket-user">Class: <strong>${b.ticketClass.split(' ')[0]}</strong> | By: ${b.name}</p>
-                    </div>
-                    <div class="ticket-count">${b.seats} Pass</div>
-                </li>
-            `).join('');
-        }
-
-        form.addEventListener('submit', async (e) => {
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            await fetch('/api/bookings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    movie: document.getElementById('movie').value,
-                    date: document.getElementById('date').value,
-                    time: document.getElementById('time').value,
-                    ticketClass: document.getElementById('ticketClass').value,
-                    name: document.getElementById('name').value,
-                    seats: document.getElementById('seats').value
-                })
-            });
-            form.reset();
-            load();
+
+            // Assemble application form configuration values
+            const payload = {
+                movie: document.getElementById('movie').value,
+                seats: document.getElementById('seats').value,
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value
+            };
+
+            try {
+                // Post payload straight to backend
+                const response = await fetch('/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const form = document.getElementById('bookingForm');
+                    const receiptContainer = document.getElementById('receiptContainer');
+
+                    // Smooth transition: Hide the entry form fields
+                    form.classList.add('hidden');
+
+                    // Inject structured booking details card component layout
+                    receiptContainer.innerHTML = `
+                        <div class="ticket-receipt">
+                            <h3>BOOKING CONFIRMED</h3>
+                            <div class="ticket-line"></div>
+                            <div class="ticket-row"><strong>TICKET ID:</strong> <span>${data.receipt.id}</span></div>
+                            <div class="ticket-row"><strong>MOVIE:</strong> <span>${data.receipt.movie}</span></div>
+                            <div class="ticket-row"><strong>SEATS:</strong> <span>${data.receipt.seats} Ticket(s)</span></div>
+                            <div class="ticket-row"><strong>NAME:</strong> <span>${data.receipt.name}</span></div>
+                            <div class="ticket-row"><strong>DATE:</strong> <span>${data.receipt.date}</span></div>
+                            <div class="ticket-line"></div>
+                            <p style="text-align:center; margin-bottom:0; font-size:12px;">Scan at counter. Enjoy your show! 🍿</p>
+                        </div>
+                        <button onclick="window.location.reload()" style="margin-top: 20px; background-color: #3d3d5c;">Book Another Ticket</button>
+                    `;
+
+                    // Present output container interface
+                    receiptContainer.classList.remove('hidden');
+                } else {
+                    alert("Error processing ticket: " + data.message);
+                }
+            } catch (error) {
+                console.error("Networking error:", error);
+                alert("Could not connect to the backend booking service.");
+            }
         });
-        load();
     </script>
 </body>
 </html>
