@@ -6,6 +6,24 @@ let selectedTheatre = null;
 let selectedTime = "";
 let selectedSeats = [];
 
+// Matrix Configuration to replicate user layout
+const SEAT_LAYOUT = [
+    { category: "₹1350 RECLINER", rows: [{ name: "K", count: 14, gaps: [2, 4, 6, 8, 10, 12], price: 1350 }] },
+    { category: "₹540 PREMIUM", rows: [
+        { name: "J", count: 19, gaps: [3, 14], price: 540 },
+        { name: "I", count: 19, gaps: [3, 14], price: 540 },
+        { name: "H", count: 19, gaps: [3, 14], price: 540 },
+        { name: "G", count: 19, gaps: [3, 14], price: 540 },
+        { name: "F", count: 19, gaps: [3, 14], price: 540 }
+    ]},
+    { category: "₹520 EXECUTIVE", rows: [
+        { name: "E", count: 16, gaps: [2, 13], price: 520 },
+        { name: "D", count: 16, gaps: [2, 13], price: 520 },
+        { name: "C", count: 16, gaps: [2, 13], price: 520 }
+    ]},
+    { category: "₹500 NORMAL", rows: [{ name: "B", count: 16, gaps: [2, 13], price: 500 }] }
+];
+
 document.addEventListener("DOMContentLoaded", () => {
     fetch('/data/data.json')
         .then(res => res.json())
@@ -14,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
             buildCityModal();
             selectCity(appData.cities[0]);
         })
-        .catch(err => console.error("Error loading initialization data:", err));
+        .catch(err => console.error("Initialization failed:", err));
 
     document.getElementById("nav-city-btn").addEventListener("click", () => {
         document.getElementById("city-modal").style.display = "flex";
@@ -40,7 +58,6 @@ function selectCity(city) {
     selectedCity = city;
     document.getElementById("nav-city-btn").innerText = "📍 " + city;
     document.getElementById("dashboard-heading").innerText = `Recommended Movies in ${city}`;
-    document.getElementById("city-modal").style.display = "none";
     renderDashboard();
 }
 
@@ -65,10 +82,7 @@ function renderDashboard() {
     });
 }
 
-function showDashboard() {
-    switchSection("section-dashboard");
-}
-
+function showDashboard() { switchSection("section-dashboard"); }
 function switchSection(id) {
     document.querySelectorAll(".view-section").forEach(s => s.classList.remove("active-section"));
     document.getElementById(id).classList.add("active-section");
@@ -77,7 +91,6 @@ function switchSection(id) {
 function showDetails(movieId) {
     currentMovie = appData.movies.find(m => m.id === movieId);
     switchSection("section-details");
-
     document.getElementById("details-root").innerHTML = `
         <img class="details-img" src="${currentMovie.poster}">
         <div>
@@ -88,7 +101,6 @@ function showDetails(movieId) {
             <p style="line-height:1.6; color:#475569; margin-top:20px;">${currentMovie.description}</p>
         </div>
     `;
-
     buildDatePills();
     buildTheatreTimings();
 }
@@ -96,21 +108,15 @@ function showDetails(movieId) {
 function buildDatePills() {
     const container = document.getElementById("dates-root");
     container.innerHTML = "";
-    
     const options = { weekday: 'short', day: 'numeric', month: 'short' };
     for(let i = 0; i < 4; i++) {
-        let d = new Date();
-        d.setDate(d.getDate() + i);
+        let d = new Date(); d.setDate(d.getDate() + i);
         let dateString = d.toLocaleDateString('en-IN', options);
-        
         const pill = document.createElement("button");
         pill.className = "date-pill";
-        if(i === 0) {
-            pill.classList.add("selected");
-            selectedDate = dateString;
-        }
+        if(i === 0) { pill.classList.add("selected"); selectedDate = dateString; }
         pill.innerText = dateString;
-        pill.onclick = (e) => {
+        pill.onclick = () => {
             document.querySelectorAll(".date-pill").forEach(p => p.classList.remove("selected"));
             pill.classList.add("selected");
             selectedDate = dateString;
@@ -122,22 +128,15 @@ function buildDatePills() {
 function buildTheatreTimings() {
     const container = document.getElementById("theatres-root");
     container.innerHTML = "";
-    
-    const showtimes = ["10:30 AM", "02:15 PM", "06:00 PM", "09:30 PM"];
-    
+    const showtimes = ["06:15 AM", "09:10 AM", "01:35 PM", "06:00 PM"];
     appData.theatres.forEach(theatre => {
         const row = document.createElement("div");
         row.className = "theatre-row";
-        
         let buttonsHtml = "";
         showtimes.forEach(time => {
             buttonsHtml += `<button class="time-btn" onclick="selectTimeSlot('${theatre.id}', '${theatre.name}', '${time}')">${time}</button>`;
         });
-
-        row.innerHTML = `
-            <h4 style="margin-top:0; margin-bottom:12px; font-size:16px; color:#0f172a;">${theatre.name}</h4>
-            <div>${buttonsHtml}</div>
-        `;
+        row.innerHTML = `<h4 style="margin-top:0; margin-bottom:12px; font-size:16px;">${theatre.name}</h4><div>${buttonsHtml}</div>`;
         container.appendChild(row);
     });
 }
@@ -145,94 +144,100 @@ function buildTheatreTimings() {
 function selectTimeSlot(theatreId, theatreName, time) {
     selectedTheatre = { id: theatreId, name: theatreName };
     selectedTime = time;
-    
     document.getElementById("seat-movie-title").innerText = `${currentMovie.title}`;
-    document.getElementById("seat-show-details").innerText = `📍 ${selectedCity}  •  🏛️ ${theatreName}  •  📅 ${selectedDate} at ⏰ ${time}`;
-    
+    document.getElementById("seat-show-details").innerText = `${selectedTheatre.name} | ${selectedDate}, ${selectedTime}`;
     selectedSeats = [];
     document.getElementById("total-price-display").innerText = "₹0";
-    
     switchSection("section-seats");
     loadSeatGrid();
 }
 
 function loadSeatGrid() {
-    const container = document.getElementById("seats-container");
-    container.innerHTML = "";
+    const gridContainer = document.getElementById("dynamic-seating-grid");
+    gridContainer.innerHTML = "";
 
-    // Step 1: Generate the seats immediately so they are always visible
-    const totalSeatsCount = 40;
-    const seatElements = {};
-
-    for (let i = 1; i <= totalSeatsCount; i++) {
-        const seat = document.createElement("div");
-        seat.className = "seat";
-        seat.innerText = i;
-        
-        // Rows mapping: 1-10 (Row A - VIP), 11-20 (Row B), 21-30 (Row C), 31-40 (Row D)
-        if (i <= 10) {
-            seat.classList.add("vip-seat");
-        }
-
-        seat.onclick = () => {
-            if (seat.classList.contains("occupied")) return;
-            
-            if (seat.classList.contains("selected")) {
-                seat.classList.remove("selected");
-                selectedSeats = selectedSeats.filter(s => s !== i);
-            } else {
-                seat.classList.add("selected");
-                selectedSeats.push(i);
-            }
-            calculatePrice();
-        };
-
-        container.appendChild(seat);
-        seatElements[i.toString()] = seat;
-    }
-
-    // Step 2: Fetch bookings safely without breaking layout if database is empty or offline
     fetch('/api/bookings')
         .then(res => res.json())
         .then(bookings => {
-            if (!Array.isArray(bookings)) return;
-            
-            bookings.forEach(b => {
-                if (b.city === selectedCity && 
-                    b.movieId === currentMovie.id && 
-                    b.theatreId === selectedTheatre.id && 
-                    b.date === selectedDate && 
-                    b.time === selectedTime) {
-                    
-                    if (b.seats && Array.isArray(b.seats)) {
-                        b.seats.forEach(s => {
-                            const seatKey = s.toString();
-                            if (seatElements[seatKey]) {
-                                seatElements[seatKey].classList.add("occupied");
-                                seatElements[seatKey].classList.remove("selected");
-                            }
-                        });
+            const occupiedMap = new Set();
+            if (Array.isArray(bookings)) {
+                bookings.forEach(b => {
+                    if (b.city === selectedCity && b.movieId === currentMovie.id && b.theatreId === selectedTheatre.id && b.date === selectedDate && b.time === selectedTime) {
+                        if (b.seats) b.seats.forEach(s => occupiedMap.add(s.toString()));
                     }
-                }
+                });
+            }
+
+            SEAT_LAYOUT.forEach(catBlock => {
+                const header = document.createElement("div");
+                header.className = "category-header";
+                header.innerText = catBlock.category;
+                gridContainer.appendChild(header);
+
+                catBlock.rows.forEach(rowData => {
+                    const rowDiv = document.createElement("div");
+                    rowDiv.className = "seat-row";
+
+                    const label = document.createElement("div");
+                    label.className = "row-label";
+                    label.innerText = rowData.name;
+                    rowDiv.appendChild(label);
+
+                    const seatsWrapper = document.createElement("div");
+                    seatsWrapper.className = "row-seats";
+
+                    for (let sNum = rowData.count; sNum >= 1; sNum--) {
+                        const seatId = `${rowData.name}-${sNum}`;
+
+                        const seat = document.createElement("div");
+                        seat.className = "seat";
+                        seat.innerText = sNum;
+
+                        if (occupiedMap.has(seatId)) {
+                            seat.classList.add("occupied");
+                        } else {
+                            seat.onclick = () => {
+                                if (seat.classList.contains("selected")) {
+                                    seat.classList.remove("selected");
+                                    selectedSeats = selectedSeats.filter(s => s.id !== seatId);
+                                } else {
+                                    seat.classList.add("selected");
+                                    selectedSeats.push({ id: seatId, price: rowData.price });
+                                }
+                                calculatePrice();
+                            };
+                        }
+
+                        seatsWrapper.appendChild(seat);
+
+                        if (rowData.gaps.includes(sNum)) {
+                            const gap = document.createElement("div");
+                            gap.className = "seat.gap";
+                            gap.style.width = "28px";
+                            seatsWrapper.appendChild(gap);
+                        }
+                    }
+                    rowDiv.appendChild(seatsWrapper);
+                    gridContainer.appendChild(rowDiv);
+                });
             });
         })
-        .catch(err => console.log("No existing bookings found, starting with clean layout."));
+        .catch(err => console.error("Seating layout parsing issue:", err));
 }
 
 function calculatePrice() {
     let total = 0;
-    selectedSeats.forEach(seatNum => {
-        total += (seatNum <= 10) ? 300 : 150;
-    });
+    selectedSeats.forEach(s => total += s.price);
     document.getElementById("total-price-display").innerText = `₹${total}`;
 }
 
 function processBooking() {
-    if(selectedSeats.length === 0) {
-        alert("Please pick at least one seat!");
+    if (selectedSeats.length === 0) {
+        alert("Please select at least one seat!");
         return;
     }
 
+    const seatIds = selectedSeats.map(s => s.id);
     const payload = {
         movieId: currentMovie.id,
         movieTitle: currentMovie.title,
@@ -241,7 +246,7 @@ function processBooking() {
         theatreName: selectedTheatre.name,
         date: selectedDate,
         time: selectedTime,
-        seats: selectedSeats
+        seats: seatIds
     };
 
     fetch('/api/bookings', {
@@ -250,31 +255,23 @@ function processBooking() {
         body: JSON.stringify(payload)
     })
     .then(res => {
-        if(!res.ok) throw new Error("Seats already taken!");
+        if (!res.ok) throw new Error("Some seats were taken just now!");
         return res.json();
     })
-    .then(bookingResult => {
-        renderReceipt(bookingResult);
+    .then(ticket => {
+        let total = 0;
+        selectedSeats.forEach(s => total += s.price);
+        document.getElementById("receipt-root").innerHTML = `
+            <h2 style="color:#10b981; margin-top:0;">Booking Confirmed! 🎉</h2>
+            <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0;">
+            <h3 style="color:#dc2626; font-size:22px; margin:0 0 15px 0;">${ticket.movieTitle}</h3>
+            <p><strong>Theatre:</strong> ${ticket.theatreName}</p>
+            <p><strong>Date & Time:</strong> ${ticket.date} at ${ticket.time}</p>
+            <p><strong>Seats Chosen:</strong> ${ticket.seats.join(", ")}</p>
+            <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0;">
+            <h3>Total Paid: ₹${total}</h3>
+        `;
         switchSection("section-receipt");
     })
     .catch(err => alert(err.message));
-}
-
-function renderReceipt(ticket) {
-    let total = 0;
-    ticket.seats.forEach(s => total += (parseInt(s) <= 10) ? 300 : 150);
-
-    document.getElementById("receipt-root").innerHTML = `
-        <h2 style="color:#10b981; margin-top:0;">Booking Confirmed! 🎉</h2>
-        <p style="font-size:13px; color:#64748b;">ID: ${ticket.id}</p>
-        <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0;">
-        <h3 style="margin:0; color:#dc2626; font-size:22px;">${ticket.movieTitle}</h3>
-        <p style="margin:8px 0;"><strong>City:</strong> ${ticket.city}</p>
-        <p style="margin:8px 0;"><strong>Theatre:</strong> ${ticket.theatreName}</p>
-        <p style="margin:8px 0;"><strong>Date:</strong> ${ticket.date}</p>
-        <p style="margin:8px 0;"><strong>Showtime:</strong> ${ticket.time}</p>
-        <p style="margin:8px 0;"><strong>Seats Chosen:</strong> ${ticket.seats.join(", ")}</p>
-        <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0;">
-        <h3 style="margin:0; font-size:20px; color:#0f172a;">Paid Amount: ₹${total}</h3>
-    `;
 }
