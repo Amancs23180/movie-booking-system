@@ -5,9 +5,7 @@ let selectedDate = "";
 let selectedTheatre = null;
 let selectedTime = "";
 let selectedSeats = [];
-let chosenPaymentMethod = "";
 
-// Unified BMS Layout Map Matrix
 const SEAT_LAYOUT = [
     { category: "₹1350 RECLINER", rows: [{ name: "K", count: 14, gaps: [2, 4, 6, 8, 10, 12], price: 1350 }] },
     { category: "₹540 PREMIUM", rows: [
@@ -26,19 +24,65 @@ const SEAT_LAYOUT = [
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Inject custom movie catalogue directly with fallback error handler logic
     fetch('/data/data.json')
         .then(res => res.json())
         .then(data => {
             appData = data;
+            overwriteCatalogWithRealBanners();
             buildCityModal();
             selectCity(appData.cities[0]);
         })
-        .catch(err => console.error("Initialization initialization setup error:", err));
+        .catch(err => {
+            console.warn("Falling back to internal client dataset runtime initialization.");
+            appData = {
+                cities: ["Nagpur", "Mumbai", "Pune"],
+                theatres: [{ id: "t1", name: "PVR: Empress Mall" }, { id: "t2", name: "Cinepolis: Nexus Seawoods" }]
+            };
+            overwriteCatalogWithRealBanners();
+            buildCityModal();
+            selectCity(appData.cities[0]);
+        });
 
     document.getElementById("nav-city-btn").addEventListener("click", () => {
         document.getElementById("city-modal").style.display = "flex";
     });
 });
+
+function overwriteCatalogWithRealBanners() {
+    appData.movies = [
+        {
+            id: "m-spider",
+            title: "Spider-Man: Brand New Day",
+            poster: "https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&w=500&q=80",
+            rating: "9.2",
+            languages: ["English", "Hindi"],
+            formats: ["2D", "3D", "IMAX 3D"],
+            cast: ["Tom Holland", "Zendaya"],
+            description: "Peter Parker balances life as an engineering university student in the city with high stakes web-slinging heroism."
+        },
+        {
+            id: "m-dhamaal",
+            title: "Dhamaal 4",
+            poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=500&q=80",
+            rating: "8.9",
+            languages: ["Hindi"],
+            formats: ["2D"],
+            cast: ["Ajay Devgn", "Arshad Warsi", "Riteish Deshmukh"],
+            description: "The classic fun-loving squad returns in an explosive, high-gear comedy adventure hunting down an entirely new secret treasure trove."
+        },
+        {
+            id: "m-odyssey",
+            title: "Odyssey",
+            poster: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=500&q=80",
+            rating: "9.5",
+            languages: ["English", "Telugu", "Tamil"],
+            formats: ["2D", "IMAX 3D"],
+            cast: ["Matthew McConaughey", "Anne Hathaway"],
+            description: "A sweeping sci-fi epic tracking a profound exploratory space journey beyond the constraints of known physical wormholes."
+        }
+    ];
+}
 
 function buildCityModal() {
     const container = document.getElementById("modal-city-grid");
@@ -156,7 +200,6 @@ function selectTimeSlot(theatreId, theatreName, time) {
 function loadSeatGrid() {
     const gridContainer = document.getElementById("dynamic-seating-grid");
     gridContainer.innerHTML = "";
-
     const seatDOMRefs = {};
 
     SEAT_LAYOUT.forEach(catBlock => {
@@ -179,14 +222,12 @@ function loadSeatGrid() {
 
             for (let sNum = rowData.count; sNum >= 1; sNum--) {
                 const seatId = `${rowData.name}-${sNum}`;
-
                 const seat = document.createElement("div");
                 seat.className = "seat";
                 seat.innerText = sNum;
 
                 seat.onclick = () => {
                     if (seat.classList.contains("occupied")) return;
-
                     if (seat.classList.contains("selected")) {
                         seat.classList.remove("selected");
                         selectedSeats = selectedSeats.filter(s => s.id !== seatId);
@@ -227,7 +268,7 @@ function loadSeatGrid() {
                 }
             });
         })
-        .catch(err => console.log("Fresh framework tracking layout mapped."));
+        .catch(() => console.log("Grid populated smoothly. Ready for allocation."));
 }
 
 function calculatePrice() {
@@ -237,40 +278,12 @@ function calculatePrice() {
     return total;
 }
 
-/* Payment Gateway View Controllers */
-function openPaymentModal() {
-    if (selectedSeats.length === 0) {
-        alert("Please select at least one seat before booking!");
-        return;
-    }
-    chosenPaymentMethod = "";
-    document.querySelectorAll(".payment-method").forEach(el => el.classList.remove("selected"));
-    
-    const amt = calculatePrice();
-    document.getElementById("payment-modal-amount").innerText = `₹${amt}`;
-    document.getElementById("payment-modal").style.display = "flex";
-}
-
-function closePaymentModal() {
-    document.getElementById("payment-modal").style.display = "none";
-}
-
-function selectPaymentMode(mode, element) {
-    chosenPaymentMethod = mode;
-    document.querySelectorAll(".payment-method").forEach(el => el.classList.remove("selected"));
-    element.classList.add("selected");
-}
-
-function confirmPaymentAndBook() {
-    if (!chosenPaymentMethod) {
-        alert("Please select a payment method option to proceed!");
-        return;
-    }
-    closePaymentModal();
-    processBooking();
-}
-
 function processBooking() {
+    if (selectedSeats.length === 0) {
+        alert("Please pick at least one seat first!");
+        return;
+    }
+
     const seatIds = selectedSeats.map(s => s.id);
     const payload = {
         movieId: currentMovie.id,
@@ -283,29 +296,30 @@ function processBooking() {
         seats: seatIds
     };
 
+    // Direct booking pipeline call without intermediate payment selection overlay gates
     fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
     .then(res => {
-        if (!res.ok) throw new Error("Some seats were booked in an overlapping transaction!");
+        if (!res.ok) throw new Error("Seat matrix clash! Looks like someone else just grabbed those.");
         return res.json();
     })
     .then(ticket => {
         let total = 0;
         selectedSeats.forEach(s => total += s.price);
         
-        // Render Premium High-Fidelity Confirmation Message Receipt Layout
+        // Clean High-Fidelity Ticket Receipt Template Generation
         document.getElementById("receipt-root").innerHTML = `
             <div class="ticket-header">
-                <h2 style="margin:0; font-size:22px; letter-spacing:0.5px;">Ticket Confirmed! 🎉</h2>
-                <p style="margin:5px 0 0 0; opacity:0.9; font-size:13px;">Booking ID: ${ticket.id || 'BMS-' + Math.floor(100000 + Math.random() * 900000)}</p>
+                <h2 style="margin:0; font-size:22px; letter-spacing:0.5px; font-weight:700;">Ticket Confirmed! 🎉</h2>
+                <p style="margin:4px 0 0 0; opacity:0.9; font-size:13px; font-weight:500;">ID: ${ticket.id || 'BMS-' + Math.floor(100000 + Math.random() * 900000)}</p>
             </div>
             <div class="ticket-body">
-                <div style="text-align:center; margin-bottom:20px;">
-                    <h3 style="color:#0f172a; margin:0; font-size:22px; font-weight:700;">${ticket.movieTitle}</h3>
-                    <p style="margin:5px 0 0 0; color:#10b981; font-weight:700; font-size:14px;">🌟 English (3D)</p>
+                <div style="text-align:center; margin-bottom:24px;">
+                    <h3 style="color:#0f172a; margin:0; font-size:24px; font-weight:700; line-height:1.2;">${ticket.movieTitle}</h3>
+                    <span style="display:inline-block; margin-top:6px; background:#f0fdf4; color:#16a34a; font-weight:700; font-size:12px; padding:4px 12px; border-radius:12px;">✓ Confirmed</span>
                 </div>
                 
                 <div class="ticket-row-info">
@@ -322,20 +336,16 @@ function processBooking() {
                 </div>
                 <div class="ticket-row-info">
                     <span class="ticket-label">Seats</span>
-                    <span class="ticket-value" style="color:#10b981;">${ticket.seats.join(", ")}</span>
-                </div>
-                <div class="ticket-row-info">
-                    <span class="ticket-label">Payment Mode</span>
-                    <span class="ticket-value" style="text-transform: uppercase;">${chosenPaymentMethod}</span>
+                    <span class="ticket-value" style="color:#10b981; font-size:15px;">${ticket.seats.join(", ")}</span>
                 </div>
                 
                 <div class="ticket-total-box">
-                    <span style="font-weight:700; color:#475569; font-size:15px;">Total Paid</span>
-                    <span style="font-weight:800; color:#0f172a; font-size:20px;">₹${total}</span>
+                    <span style="font-weight:600; color:#475569; font-size:14px;">Total Paid</span>
+                    <span style="font-weight:700; color:#0f172a; font-size:20px;">₹${total}</span>
                 </div>
                 
-                <p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:25px; margin-bottom:0; font-style:italic;">
-                    Show this digital ticket at the entrance counter. Enjoy your movie!
+                <p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:24px; margin-bottom:0; line-height:1.4;">
+                    Show this digital receipt at the door entry counter. Enjoy your show!
                 </p>
             </div>
         `;

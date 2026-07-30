@@ -11,18 +11,11 @@
         .city-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 20px; color: #334155; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .city-btn:hover { border-color: #dc2626; color: #dc2626; background: #fff5f5; }
         
-        /* Modals */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #ffffff; padding: 30px; border-radius: 16px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-content { background: #ffffff; padding: 30px; border-radius: 16px; max-width: 550px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .grid-cities { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-top: 20px; }
         .city-card { background: #f8fafc; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #e2e8f0; font-weight: 500; transition: 0.2s; }
         .city-card:hover { border-color: #dc2626; background: #fff5f5; color: #dc2626; }
-
-        /* Payment Options Layout */
-        .payment-options { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; text-align: left; }
-        .payment-method { display: flex; align-items: center; gap: 12px; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: 600; }
-        .payment-method:hover { border-color: #10b981; background: #f0fdf4; }
-        .payment-method.selected { border-color: #10b981; background: #f0fdf4; color: #15803d; }
 
         .container { padding: 40px; max-width: 1200px; margin: 0 auto; }
         .movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 30px; margin-top: 20px; }
@@ -30,7 +23,7 @@
         .movie-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
         .movie-card img { width: 100%; height: 340px; object-fit: cover; }
         .movie-info { padding: 15px; }
-        .movie-title { margin: 0 0 8px 0; font-size: 18px; color: #0f172a; }
+        .movie-title { margin: 0 0 8px 0; font-size: 18px; color: #0f172a; font-weight: 700; }
         .movie-meta { font-size: 14px; color: #64748b; display: flex; justify-content: space-between; }
 
         .view-section { display: none; }
@@ -47,7 +40,6 @@
         .time-btn { background: #fff; border: 1px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 10px; font-weight: 600; }
         .time-btn:hover { background: #10b981; color: white; }
 
-        /* Seating View styling */
         .seating-area { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 40px 20px; max-width: 950px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.02); overflow-x: auto; }
         .category-header { font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 1px; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin: 25px 0 15px 0; padding-left: 50px; text-align: left; }
         
@@ -69,29 +61,26 @@
         .legend-item { display: flex; align-items: center; gap: 8px; }
         .box { width: 16px; height: 16px; border-radius: 3px; }
 
-        .btn-prime { background: #dc2626; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; max-width: 350px; display: block; margin: 30px auto 0 auto; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.15); }
+        .btn-prime { background: #dc2626; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; max-width: 350px; display: block; margin: 30px auto 0 auto; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.15); transition: background 0.2s; }
         .btn-prime:hover { background: #b91c1c; }
-        .btn-secondary { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 10px; }
         
-        /* Modern Ticket Design */
-        .ticket-wrapper { background: #ffffff; max-width: 480px; margin: 0 auto; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
-        .ticket-header { background: #10b981; color: white; padding: 25px; text-align: center; }
-        .ticket-body { padding: 30px; text-align: left; position: relative; background: #ffffff; }
-        .ticket-row-info { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 10px; }
-        .ticket-label { color: #64748b; font-size: 13px; font-weight: 500; text-transform: uppercase; }
-        .ticket-value { color: #0f172a; font-size: 15px; font-weight: 600; }
-        .ticket-total-box { background: #f8fafc; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border: 1px solid #e2e8f0; }
+        /* Premium Clean Booking Confirmation UI */
+        .ticket-wrapper { background: #ffffff; max-width: 460px; margin: 0 auto; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+        .ticket-header { background: #10b981; color: white; padding: 24px; text-align: center; }
+        .ticket-body { padding: 28px; text-align: left; background: #ffffff; }
+        .ticket-row-info { display: flex; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 8px; }
+        .ticket-label { color: #64748b; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ticket-value { color: #0f172a; font-size: 14px; font-weight: 600; }
+        .ticket-total-box { background: #f8fafc; padding: 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body>
 
-    <!-- Main Navigation Bar -->
     <nav>
         <div class="logo" onclick="showDashboard()">BookMyShow Pro</div>
         <button class="city-btn" id="nav-city-btn">📍 Select City</button>
     </nav>
 
-    <!-- Location Modal Selection Dialog -->
     <div class="modal" id="city-modal" style="display:none;">
         <div class="modal-content">
             <h2 style="margin-top:0;">Select Your City</h2>
@@ -99,37 +88,14 @@
         </div>
     </div>
 
-    <!-- Integrated Payment Gateway Modal Overlay -->
-    <div class="modal" id="payment-modal" style="display:none;">
-        <div class="modal-content">
-            <h3 style="margin-top:0; font-size:20px; color:#0f172a;">Select Payment Mode</h3>
-            <p style="color:#64748b; font-size:14px; margin-bottom:20px;">Amount Payable: <strong style="color:#0f172a;" id="payment-modal-amount">₹0</strong></p>
-            
-            <div class="payment-options">
-                <div class="payment-method" onclick="selectPaymentMode('upi', this)">
-                    <span>📱</span> UPI (GPay, PhonePe, Paytm)
-                </div>
-                <div class="payment-method" onclick="selectPaymentMode('card', this)">
-                    <span>💳</span> Credit / Debit Card
-                </div>
-                <div class="payment-method" onclick="selectPaymentMode('netbanking', this)">
-                    <span>🏦</span> Net Banking
-                </div>
-            </div>
-
-            <button class="btn-prime" style="margin-top:20px;" onclick="confirmPaymentAndBook()">Make Secure Payment</button>
-            <button class="btn-secondary" onclick="closePaymentModal()">Cancel</button>
-        </div>
-    </div>
-
     <div class="container">
-        <!-- Dashboard View Section -->
+        <!-- Dashboard Section -->
         <div id="section-dashboard" class="view-section active-section">
             <h2 id="dashboard-heading">Recommended Movies</h2>
             <div class="movies-grid" id="movies-container"></div>
         </div>
 
-        <!-- Details & Timings Scheduling View -->
+        <!-- Details & Showtimes Section -->
         <div id="section-details" class="view-section">
             <button class="city-btn" onclick="showDashboard()" style="margin-bottom:20px;">← Back to Movies</button>
             <div class="details-layout" id="details-root"></div>
@@ -139,7 +105,7 @@
             <div id="theatres-root"></div>
         </div>
 
-        <!-- Grid Layout Visualization -->
+        <!-- Seating Layout Grid Section -->
         <div id="section-seats" class="view-section">
             <button class="city-btn" onclick="showDetails(currentMovie.id)" style="margin-bottom:20px;">← Back to Times</button>
             <h2 style="text-align:center; margin-bottom:5px;" id="seat-movie-title">Movie</h2>
@@ -160,13 +126,14 @@
                 <div class="legend-item"><div class="box" style="background: #10b981;"></div> Selected</div>
             </div>
 
-            <button class="btn-prime" onclick="openPaymentModal()">Proceed to Pay (<span id="total-price-display">₹0</span>)</button>
+            <!-- Single action direct booking button -->
+            <button class="btn-prime" onclick="processBooking()">Book Tickets (<span id="total-price-display">₹0</span>)</button>
         </div>
 
-        <!-- Receipt Confirmation Message View -->
+        <!-- Modern Receipt View Section -->
         <div id="section-receipt" class="view-section">
             <div class="ticket-wrapper" id="receipt-root"></div>
-            <button class="btn-prime" onclick="showDashboard()">Book More Movies</button>
+            <button class="btn-prime" onclick="showDashboard()" style="margin-top: 30px;">Book More Movies</button>
         </div>
     </div>
 
