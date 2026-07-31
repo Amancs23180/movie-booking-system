@@ -6,12 +6,18 @@ let selectedTheatre = null;
 let selectedTime = "";
 let selectedSeats = [];
 
-// Persistent locally managed memory cache layer to ensure bought tickets survive route transitions flawlessly
+// Persistent state cache arrays ensuring data models survive state transitions
 let localSimulationBookings = [];
+let localSimulationParking = []; // Dynamic persistence array tracking taken slots per show parameters
 
-// Add-ons runtime configuration values
 let chosenParking = { type: null, price: 0 };
 let chosenSnacks = [];
+
+// Static Basement Parking Lot Matrix Blueprint mapping
+const PARKING_LOT_MAPS = {
+    "2wheeler": ["B-01", "B-02", "B-03", "B-04", "B-05", "B-06", "B-07", "B-08"],
+    "car": ["C-01", "C-02", "C-03", "C-04", "C-05", "C-06", "C-07", "C-08"]
+};
 
 const SEAT_LAYOUT = [
     { category: "₹1350 RECLINER", rows: [{ name: "K", count: 14, gaps: [2, 4, 6, 8, 10, 12], price: 1350 }] },
@@ -334,29 +340,45 @@ function calculatePrice() {
     return total;
 }
 
-function displayReceiptUI() {
+function displayReceiptUI(allocatedSlot) {
     const seatIds = selectedSeats.map(s => s.id);
     const generatedId = 'BMS-' + Math.floor(100000 + Math.random() * 900000);
 
-    // Generate dynamic parking slots and blueprint interactive visual matrix
     let parkingRowHtml = "";
-    if (chosenParking.type) {
-        const prefix = chosenParking.type === "car" ? "P-CAR-" : "P-2W-";
-        const slotNumber = prefix + Math.floor(100 + Math.random() * 900);
-        
-        // Render detailed structural map nodes indicating highlighted targeted assignments
+    if (chosenParking.type && allocatedSlot) {
+        // Find all slots already reserved for this specific time slot to show them as occupied on the map
+        const slotsTakenAtThisTime = localSimulationParking
+            .filter(p => p.city === selectedCity && p.theatreId === selectedTheatre.id && p.date === selectedDate && p.time === selectedTime && p.type === chosenParking.type)
+            .map(p => p.slot);
+
+        const fullPool = PARKING_LOT_MAPS[chosenParking.type];
+        let mapGridNodesHtml = "";
+
+        // Build out the full view map grid dynamically
+        fullPool.forEach(slot => {
+            if (slot === allocatedSlot) {
+                mapGridNodesHtml += `<div class="parking-slot-node booked-active">${slot} (You)</div>`;
+            } else if (slotsTakenAtThisTime.includes(slot)) {
+                mapGridNodesHtml += `<div class="parking-slot-node occupied">${slot}</div>`;
+            } else {
+                mapGridNodesHtml += `<div class="parking-slot-node">${slot}</div>`;
+            }
+        });
+
         parkingRowHtml = `
-            <div class="ticket-row-info" style="border-bottom:none; margin-bottom:0;">
-                <span class="ticket-label">Parking Space</span>
-                <span class="ticket-value" style="color:#ef4444; font-weight:bold;">${slotNumber}</span>
+            <div class="ticket-row-info" style="border-bottom:none; margin-bottom:0; margin-top:10px;">
+                <span class="ticket-label">Allotted Space</span>
+                <span class="ticket-value" style="color:#dc2626; font-weight:bold; font-size:16px;">${allocatedSlot}</span>
             </div>
             <div class="parking-map-box">
-                <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Basement Map View:</span>
+                <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">📋 Full Basement Layout Map:</span>
                 <div class="parking-grid-view">
-                    <div class="parking-slot-node">Slot A1</div>
-                    <div class="parking-slot-node booked-active">${slotNumber}</div>
-                    <div class="parking-slot-node">Slot A3</div>
-                    <div class="parking-slot-node">Slot B1</div>
+                    ${mapGridNodesHtml}
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:10px; color:#94a3b8; font-weight:500;">
+                    <span>🟥 Red = Your Slot</span>
+                    <span>❌ Crossed = Occupied</span>
+                    <span>⬜ White = Available</span>
                 </div>
             </div>
         `;
@@ -417,6 +439,33 @@ function processBooking() {
         return;
     }
 
+    let allocatedSlot = null;
+    if (chosenParking.type) {
+        // Find slots already occupied for this theater show runtime window parameters
+        const occupiedSlots = localSimulationParking
+            .filter(p => p.city === selectedCity && p.theatreId === selectedTheatre.id && p.date === selectedDate && p.time === selectedTime && p.type === chosenParking.type)
+            .map(p => p.slot);
+
+        // Find the first unallocated open node from the pool matrix 
+        const pool = PARKING_LOT_MAPS[chosenParking.type];
+        allocatedSlot = pool.find(slot => !occupiedSlots.includes(slot));
+
+        if (!allocatedSlot) {
+            alert("Sorry, parking slots are completely full for this show timing! Proceeding without parking reservation.");
+            chosenParking = { type: null, price: 0 };
+        } else {
+            // Persist allocation data inside state memory model layer instantly
+            localSimulationParking.push({
+                city: selectedCity,
+                theatreId: selectedTheatre.id,
+                date: selectedDate,
+                time: selectedTime,
+                type: chosenParking.type,
+                slot: allocatedSlot
+            });
+        }
+    }
+
     const seatIds = selectedSeats.map(s => s.id);
     const payload = {
         movieId: currentMovie.id,
@@ -436,10 +485,6 @@ function processBooking() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-    .then(() => {
-        displayReceiptUI();
-    })
-    .catch(() => {
-        displayReceiptUI();
-    });
+    .then(() => displayReceiptUI(allocatedSlot))
+    .catch(() => displayReceiptUI(allocatedSlot));
 }

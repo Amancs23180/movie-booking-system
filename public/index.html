@@ -51,7 +51,6 @@
         .seat:hover:not(.occupied) { background: #10b981; color: white; }
         .seat.selected { background: #10b981 !important; color: white !important; }
         
-        /* High visibility Crimson Red for occupied/sold tickets */
         .seat.occupied { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; cursor: not-allowed; font-weight: 700; }
         .seat.gap { visibility: hidden; width: 28px; cursor: default; border: none; }
 
@@ -63,7 +62,6 @@
         .legend-item { display: flex; align-items: center; gap: 8px; }
         .box { width: 16px; height: 16px; border-radius: 3px; }
 
-        /* Add-ons Panels */
         .addons-title { margin-top: 40px; text-align: center; color: #0f172a; font-size: 20px; font-weight: 700; }
         .addons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 950px; margin: 20px auto 0 auto; }
         .addon-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -78,16 +76,17 @@
         .ticket-wrapper { background: #ffffff; max-width: 460px; margin: 0 auto; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
         .ticket-header { background: #10b981; color: white; padding: 24px; text-align: center; }
         .ticket-body { padding: 28px; text-align: left; background: #ffffff; }
-        .ticket-row-info { display: flex; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 8px; }
+        .ticket-row-info { display: flex; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 8px; align-items: center; }
         .ticket-label { color: #64748b; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
         .ticket-value { color: #0f172a; font-size: 14px; font-weight: 600; text-align: right; }
         .ticket-total-box { background: #f8fafc; padding: 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border: 1px solid #e2e8f0; }
 
-        /* Structural Styles for Visual Parking Maps inside confirmation tickets */
-        .parking-map-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-top: 15px; }
-        .parking-grid-view { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
-        .parking-slot-node { border: 1px dashed #94a3b8; text-align: center; padding: 6px 0; font-size: 11px; font-weight: bold; color: #64748b; border-radius: 4px; background: #ffffff; }
-        .parking-slot-node.booked-active { background: #dc2626 !important; border-color: #dc2626 !important; color: white !important; animation: pulse 2s infinite; }
+        /* Full Interactive Parking Layout Maps inside receipts */
+        .parking-map-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-top: 15px; }
+        .parking-grid-view { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+        .parking-slot-node { border: 1px solid #cbd5e1; text-align: center; padding: 8px 0; font-size: 11px; font-weight: 600; color: #475569; border-radius: 6px; background: #ffffff; text-transform: uppercase; }
+        .parking-slot-node.occupied { background: #fee2e2 !important; border-color: #f87171 !important; color: #b91c1c !important; text-decoration: line-through; cursor: not-allowed; }
+        .parking-slot-node.booked-active { background: #dc2626 !important; border-color: #dc2626 !important; color: white !important; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -138,7 +137,7 @@
 
             <div class="legend">
                 <div class="legend-item"><div class="box" style="border: 1px solid #10b981; background: #ffffff;"></div> Available</div>
-                <div class="legend-item"><div class="box" style="background: #f8fafc; border: 1px solid #ef4444;"></div> Sold (Red Cover)</div>
+                <div class="legend-item"><div class="box" style="background: #fee2e2; border: 1px solid #ef4444;"></div> Sold (Red Cover)</div>
                 <div class="legend-item"><div class="box" style="background: #10b981;"></div> Selected</div>
             </div>
 
