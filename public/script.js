@@ -197,7 +197,6 @@ function selectTimeSlot(theatreId, theatreName, time) {
     document.getElementById("seat-movie-title").innerText = `${currentMovie.title}`;
     document.getElementById("seat-show-details").innerText = `${selectedTheatre.name} | ${selectedDate}, ${selectedTime}`;
     
-    // Reset selection runtime arrays cleanly
     selectedSeats = [];
     chosenSnacks = [];
     chosenParking = { type: null, price: 0 };
@@ -209,7 +208,6 @@ function selectTimeSlot(theatreId, theatreName, time) {
     loadSeatGrid();
 }
 
-/* Add-ons UX Option Selection Rules */
 function selectParking(type, price) {
     const el2w = document.getElementById("park-2w");
     const el4w = document.getElementById("park-4w");
@@ -300,7 +298,6 @@ function loadSeatGrid() {
         });
     });
 
-    // Unified render layer processing remote server bookings AND locally cached runtime matrix blocks seamlessly
     const processUnifiedOccupancy = (list) => {
         if (!Array.isArray(list)) return;
         list.forEach(b => {
@@ -316,7 +313,6 @@ function loadSeatGrid() {
         });
     };
 
-    // Layer server items first
     fetch('/api/bookings')
         .then(res => res.json())
         .then(bookings => {
@@ -339,17 +335,32 @@ function calculatePrice() {
 }
 
 function displayReceiptUI() {
-    let seatTotal = 0;
-    selectedSeats.forEach(s => total => seatTotal += s.price);
     const seatIds = selectedSeats.map(s => s.id);
     const generatedId = 'BMS-' + Math.floor(100000 + Math.random() * 900000);
 
-    // Format display lists strings dynamically for receipt rendering boxes
-    let parkingRowHtml = chosenParking.type ? `
-        <div class="ticket-row-info">
-            <span class="ticket-label">Premium Parking</span>
-            <span class="ticket-value" style="text-transform: capitalize;">${chosenParking.type} (₹${chosenParking.price})</span>
-        </div>` : "";
+    // Generate dynamic parking slots and blueprint interactive visual matrix
+    let parkingRowHtml = "";
+    if (chosenParking.type) {
+        const prefix = chosenParking.type === "car" ? "P-CAR-" : "P-2W-";
+        const slotNumber = prefix + Math.floor(100 + Math.random() * 900);
+        
+        // Render detailed structural map nodes indicating highlighted targeted assignments
+        parkingRowHtml = `
+            <div class="ticket-row-info" style="border-bottom:none; margin-bottom:0;">
+                <span class="ticket-label">Parking Space</span>
+                <span class="ticket-value" style="color:#ef4444; font-weight:bold;">${slotNumber}</span>
+            </div>
+            <div class="parking-map-box">
+                <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Basement Map View:</span>
+                <div class="parking-grid-view">
+                    <div class="parking-slot-node">Slot A1</div>
+                    <div class="parking-slot-node booked-active">${slotNumber}</div>
+                    <div class="parking-slot-node">Slot A3</div>
+                    <div class="parking-slot-node">Slot B1</div>
+                </div>
+            </div>
+        `;
+    }
 
     let snacksRowHtml = chosenSnacks.length > 0 ? `
         <div class="ticket-row-info">
@@ -384,8 +395,8 @@ function displayReceiptUI() {
                 <span class="ticket-label">Seats</span>
                 <span class="ticket-value" style="color:#10b981; font-size:15px;">${seatIds.join(", ")}</span>
             </div>
-            ${parkingRowHtml}
             ${snacksRowHtml}
+            ${parkingRowHtml}
             
             <div class="ticket-total-box">
                 <span style="font-weight:600; color:#475569; font-size:14px;">Grand Total</span>
@@ -418,7 +429,6 @@ function processBooking() {
         seats: seatIds
     };
 
-    // Cache the seat IDs into local state cache instantly so they appear as booked right away next time
     localSimulationBookings.push(payload);
 
     fetch('/api/bookings', {

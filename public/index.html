@@ -50,7 +50,9 @@
         .seat { width: 34px; height: 34px; border: 1px solid #10b981; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #10b981; cursor: pointer; transition: all 0.15s; background: #ffffff; user-select: none; }
         .seat:hover:not(.occupied) { background: #10b981; color: white; }
         .seat.selected { background: #10b981 !important; color: white !important; }
-        .seat.occupied { background: #e2e8f0 !important; border-color: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed; }
+        
+        /* High visibility Crimson Red for occupied/sold tickets */
+        .seat.occupied { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; cursor: not-allowed; font-weight: 700; }
         .seat.gap { visibility: hidden; width: 28px; cursor: default; border: none; }
 
         .screen-container { text-align: center; margin: 60px 0 20px 0; }
@@ -80,6 +82,12 @@
         .ticket-label { color: #64748b; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
         .ticket-value { color: #0f172a; font-size: 14px; font-weight: 600; text-align: right; }
         .ticket-total-box { background: #f8fafc; padding: 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border: 1px solid #e2e8f0; }
+
+        /* Structural Styles for Visual Parking Maps inside confirmation tickets */
+        .parking-map-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-top: 15px; }
+        .parking-grid-view { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+        .parking-slot-node { border: 1px dashed #94a3b8; text-align: center; padding: 6px 0; font-size: 11px; font-weight: bold; color: #64748b; border-radius: 4px; background: #ffffff; }
+        .parking-slot-node.booked-active { background: #dc2626 !important; border-color: #dc2626 !important; color: white !important; animation: pulse 2s infinite; }
     </style>
 </head>
 <body>
@@ -130,14 +138,13 @@
 
             <div class="legend">
                 <div class="legend-item"><div class="box" style="border: 1px solid #10b981; background: #ffffff;"></div> Available</div>
-                <div class="legend-item"><div class="box" style="background: #e2e8f0;"></div> Sold</div>
+                <div class="legend-item"><div class="box" style="background: #f8fafc; border: 1px solid #ef4444;"></div> Sold (Red Cover)</div>
                 <div class="legend-item"><div class="box" style="background: #10b981;"></div> Selected</div>
             </div>
 
             <!-- Dynamic Parking & Snacks Recommender System -->
             <div class="addons-title">Personalize Your Experience (Optional Add-ons)</div>
             <div class="addons-grid">
-                <!-- Vehicle Parking selection container -->
                 <div class="addon-card">
                     <h4 style="margin-top:0; margin-bottom:15px; color:#1e293b;">🏢 Reserve Premium Parking</h4>
                     <div class="addon-option" id="park-2w" onclick="selectParking('2wheeler', 40)">
@@ -148,7 +155,6 @@
                     </div>
                 </div>
 
-                <!-- Food and Beverages pre-buy container -->
                 <div class="addon-card">
                     <h4 style="margin-top:0; margin-bottom:15px; color:#1e293b;">🍿 Food & Beverages Recommender</h4>
                     <div class="addon-option" id="fnb-popcorn" onclick="toggleSnack('popcorn', 250)">
