@@ -61,16 +61,24 @@
         .legend-item { display: flex; align-items: center; gap: 8px; }
         .box { width: 16px; height: 16px; border-radius: 3px; }
 
+        /* Add-ons Panels */
+        .addons-title { margin-top: 40px; text-align: center; color: #0f172a; font-size: 20px; font-weight: 700; }
+        .addons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 950px; margin: 20px auto 0 auto; }
+        .addon-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .addon-option { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; font-weight: 600; }
+        .addon-option:hover { border-color: #dc2626; background: #fff5f5; }
+        .addon-option.selected { border-color: #10b981; background: #f0fdf4; color: #16a34a; }
+
         .btn-prime { background: #dc2626; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; max-width: 350px; display: block; margin: 30px auto 0 auto; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.15); transition: background 0.2s; }
         .btn-prime:hover { background: #b91c1c; }
         
-        /* Premium Clean Booking Confirmation UI */
+        /* Modern Ticket Receipt Layout */
         .ticket-wrapper { background: #ffffff; max-width: 460px; margin: 0 auto; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
         .ticket-header { background: #10b981; color: white; padding: 24px; text-align: center; }
         .ticket-body { padding: 28px; text-align: left; background: #ffffff; }
         .ticket-row-info { display: flex; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 8px; }
         .ticket-label { color: #64748b; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ticket-value { color: #0f172a; font-size: 14px; font-weight: 600; }
+        .ticket-value { color: #0f172a; font-size: 14px; font-weight: 600; text-align: right; }
         .ticket-total-box { background: #f8fafc; padding: 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border: 1px solid #e2e8f0; }
     </style>
 </head>
@@ -124,6 +132,32 @@
                 <div class="legend-item"><div class="box" style="border: 1px solid #10b981; background: #ffffff;"></div> Available</div>
                 <div class="legend-item"><div class="box" style="background: #e2e8f0;"></div> Sold</div>
                 <div class="legend-item"><div class="box" style="background: #10b981;"></div> Selected</div>
+            </div>
+
+            <!-- Dynamic Parking & Snacks Recommender System -->
+            <div class="addons-title">Personalize Your Experience (Optional Add-ons)</div>
+            <div class="addons-grid">
+                <!-- Vehicle Parking selection container -->
+                <div class="addon-card">
+                    <h4 style="margin-top:0; margin-bottom:15px; color:#1e293b;">🏢 Reserve Premium Parking</h4>
+                    <div class="addon-option" id="park-2w" onclick="selectParking('2wheeler', 40)">
+                        <span>🏍️ 2-Wheeler Parking</span> <span>₹40</span>
+                    </div>
+                    <div class="addon-option" id="park-4w" onclick="selectParking('car', 100)">
+                        <span>🚗 Car Parking Space</span> <span>₹100</span>
+                    </div>
+                </div>
+
+                <!-- Food and Beverages pre-buy container -->
+                <div class="addon-card">
+                    <h4 style="margin-top:0; margin-bottom:15px; color:#1e293b;">🍿 Food & Beverages Recommender</h4>
+                    <div class="addon-option" id="fnb-popcorn" onclick="toggleSnack('popcorn', 250)">
+                        <span>🍿 Large Caramel Popcorn</span> <span>₹250</span>
+                    </div>
+                    <div class="addon-option" id="fnb-combo" onclick="toggleSnack('combo', 390)">
+                        <span>🥤 Nachos + Bottomless Soda</span> <span>₹390</span>
+                    </div>
+                </div>
             </div>
 
             <button class="btn-prime" onclick="processBooking()">Book Tickets (<span id="total-price-display">₹0</span>)</button>
